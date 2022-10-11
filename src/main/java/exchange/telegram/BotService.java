@@ -1,12 +1,15 @@
 package exchange.telegram;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
@@ -14,14 +17,16 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Slf4j
-@Configuration
-public class BotConfig extends TelegramLongPollingCommandBot {
+@Service
+public class BotService extends TelegramLongPollingCommandBot {
 
     @Value("${bot.name}")
     private String botName;
-
     @Value("${bot.token}")
     private String botToken;
+
+    @Autowired
+    private MessageProcessor messageProcessor;
 
     @PostConstruct
     public void init() {
@@ -44,7 +49,7 @@ public class BotConfig extends TelegramLongPollingCommandBot {
     }
 
     public void onUpdatesReceived(List<Update> updates) {
-        super.onUpdatesReceived(updates);
+        updates.forEach(update -> messageProcessor.process(update));
     }
 
     public void processNonCommandUpdate(Update update) {
@@ -57,5 +62,22 @@ public class BotConfig extends TelegramLongPollingCommandBot {
 
     public boolean filter(Message message) {
         return super.filter(message);
+    }
+
+    public void sendMessage(String chatId, String text, InlineKeyboardMarkup keyboardMarkup) {
+        SendMessage message = new SendMessage();
+        message.setReplyMarkup(keyboardMarkup);
+        message.setChatId(chatId);
+        message.setText(text);
+
+        send(message);
+    }
+
+    private void send(SendMessage message) {
+        try {
+            execute(message);
+        } catch (Exception e) {
+            log.error("Error sending message", e);
+        }
     }
 }
