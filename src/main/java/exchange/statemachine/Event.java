@@ -1,5 +1,5 @@
 package exchange.statemachine;
 
 public enum Event {
-    MAIN_MENU,MY_RATE, RATES
+    MAIN_MENU, MY_RATES, RATES, EXCHANGE
 }
