@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -70,10 +71,26 @@ public class BotService extends TelegramLongPollingCommandBot {
         message.setChatId(chatId);
         message.setText(text);
 
-        send(message);
+        sendMessage(message);
     }
 
-    private void send(SendMessage message) {
+    public void sendMessage(String chatId, String text){
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(text);
+
+        sendMessage(message);
+    }
+
+    public void editMessage(EditMessageReplyMarkup replyMarkup) {
+        try {
+            execute(replyMarkup);
+        } catch (TelegramApiException e) {
+            log.error("Error editing message", e);
+        }
+    }
+
+    public void sendMessage(SendMessage message) {
         try {
             execute(message);
         } catch (Exception e) {

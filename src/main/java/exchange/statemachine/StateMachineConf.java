@@ -23,7 +23,9 @@ public class StateMachineConf extends EnumStateMachineConfigurerAdapter<State, E
     @Override
     public void configure(final StateMachineStateConfigurer<State, Event> states)
             throws Exception {
-        states.withStates().initial(State.START).states(EnumSet.allOf(State.class));
+        states.withStates()
+                .initial(State.START)
+                .states(EnumSet.allOf(State.class));
     }
 
     @Override

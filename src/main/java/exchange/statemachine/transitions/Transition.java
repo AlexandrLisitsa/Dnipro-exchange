@@ -12,11 +12,13 @@ public abstract class Transition implements Action<State, Event> {
 
     public BotService botService;
 
-    public abstract void configure(StateMachineTransitionConfigurer<State, Event> transitions) throws Exception;
-
     @Autowired
     public void setBotService(@Lazy BotService botService) {
         this.botService = botService;
     }
+
+    public abstract void configure(StateMachineTransitionConfigurer<State, Event> transitions) throws Exception;
+
+    public abstract State getState();
 
 }
