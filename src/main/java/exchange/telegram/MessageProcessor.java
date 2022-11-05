@@ -1,6 +1,6 @@
 package exchange.telegram;
 
-import exchange.service.UserService;
+import exchange.service.ClientService;
 import exchange.statemachine.Event;
 import exchange.statemachine.Payload;
 import exchange.statemachine.StateMachineService;
@@ -15,31 +15,31 @@ public class MessageProcessor {
     @Autowired
     private StateMachineService stateMachineService;
     @Autowired
-    private UserService userService;
+    private ClientService clientService;
 
     public void process(Update update) {
         if (update.hasCallbackQuery()) {
             Payload payload = processCallback(update);
             stateMachineService.changeState(payload);
         } else if (update.getMessage().getContact() != null) {
-            userService.handleUser(update);
+            clientService.handleClient(update);
         } else if (update.getMessage() != null && update.getMessage().getText().equalsIgnoreCase("/start")) {
             handleStartCommand(update);
         } else {
-            Payload payload = processMessage(update);
+            Payload payload = getPayload(update);
             stateMachineService.changeState(payload);
         }
     }
 
     private void handleStartCommand(Update update) {
-        if (userService.isUserIdPresent(update)) {
-            userService.sendAuthorizationRequest(update);
+        if (clientService.isUserIdPresent(update)) {
+            clientService.sendAuthorizationRequest(update);
         } else {
-            userService.sendIdentityErrorMessage(update);
+            clientService.sendIdentityErrorMessage(update);
         }
     }
 
-    private Payload processMessage(Update update) {
+    private Payload getPayload(Update update) {
         Payload payload = new Payload();
 
         String chatId = String.valueOf(update.getMessage().getChat().getId());

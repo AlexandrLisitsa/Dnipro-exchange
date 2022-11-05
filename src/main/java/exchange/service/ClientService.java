@@ -1,6 +1,9 @@
 package exchange.service;
 
+import exchange.service.rest.ClientHttpService;
+import exchange.statemachine.StateMachineService;
 import exchange.telegram.BotService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -13,8 +16,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
-public class UserService {
+public class ClientService {
 
     private BotService botService;
 
@@ -22,6 +26,12 @@ public class UserService {
     private void setBotService(@Lazy BotService botService) {
         this.botService = botService;
     }
+
+    @Autowired
+    private ClientHttpService clientHttpService;
+
+    @Autowired
+    private StateMachineService stateMachineService;
 
     public boolean isUserIdPresent(Update update) {
         return update.getMessage().getChat().getUserName() != null;
@@ -33,12 +43,43 @@ public class UserService {
                 "Для продолжения работы с ботом необходимо установить username.");
     }
 
-    public void handleUser(Update update) {
-
+    public void handleClient(Update update) {
+        String phoneNumber = "+" + update.getMessage().getContact().getPhoneNumber();
+        String userName = update.getMessage().getChat().getUserName();
+        Long chatId = update.getMessage().getChat().getId();
+        if (isClientExists(phoneNumber)) {
+            stateMachineService.initStateMachine(userName, chatId);
+        } else {
+            createClientAndStart(phoneNumber, userName, chatId);
+        }
     }
 
-    private boolean isUserExists(String phoneNumber){
-        return true;
+    private void createClientAndStart(String phoneNumber, String userName, Long chatId) {
+        boolean isCreated = clientHttpService.createClient(phoneNumber);
+        if (isCreated) {
+            stateMachineService.initStateMachine(userName, chatId);
+        } else {
+            sendClientCreationErrorMessage(chatId);
+        }
+    }
+
+    private void sendClientCreationErrorMessage(Long chatId) {
+        SendMessage clientCreationErrorMessage = new SendMessage();
+        clientCreationErrorMessage.setChatId(chatId);
+        clientCreationErrorMessage.setText("Ошибка регистарции. Свяжитесь с технической поддержкой.");
+
+        botService.sendMessage(clientCreationErrorMessage);
+    }
+
+    private boolean isClientExists(String phoneNumber) {
+        ClientHttpService.ClientInfo clientInfo = null;
+        try {
+            clientInfo = clientHttpService.getClientInfo(phoneNumber);
+        } catch (ClientHttpService.ClientNotFoundException e) {
+            log.error("Error getting client info by number:" + phoneNumber, e);
+            return false;
+        }
+        return clientInfo.getPhone().equalsIgnoreCase(phoneNumber);
     }
 
     public void sendAuthorizationRequest(Update update) {
