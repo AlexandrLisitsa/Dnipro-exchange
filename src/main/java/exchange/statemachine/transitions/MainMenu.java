@@ -31,17 +31,18 @@ public class MainMenu extends Transition {
 
     @Override
     public void execute(StateContext<State, Event> context) {
-        InlineKeyboardButton exchange = new InlineKeyboardButton();
-        exchange.setText("Обменять");
-        exchange.setCallbackData(Event.EXCHANGE.toString());
 
         InlineKeyboardButton myRates = new InlineKeyboardButton();
         myRates.setText("Мой курс");
-        myRates.setCallbackData("1");
+        myRates.setCallbackData(Event.MY_RATES.toString());
+
+       /* InlineKeyboardButton exchange = new InlineKeyboardButton();
+        exchange.setText("Обменять");
+        exchange.setCallbackData(Event.EXCHANGE.toString());
 
         InlineKeyboardButton rates = new InlineKeyboardButton();
         rates.setText("Курсы валют");
-        rates.setCallbackData(Event.RATES.toString());
+        rates.setCallbackData(Event.RATES.toString());*/
 
         /*InlineKeyboardButton deposit = new InlineKeyboardButton();
         deposit.setText("Депозит");
@@ -69,9 +70,9 @@ public class MainMenu extends Transition {
 
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> buttons = Arrays.asList(
-                Collections.singletonList(exchange),
-                // Collections.singletonList(myRates),
-                Collections.singletonList(rates)
+                //Collections.singletonList(exchange),
+                 Collections.singletonList(myRates)
+                //Collections.singletonList(rates)
                /* Collections.singletonList(deposit),
                 Collections.singletonList(cryptoExchange),
                 Collections.singletonList(inviteFriend),

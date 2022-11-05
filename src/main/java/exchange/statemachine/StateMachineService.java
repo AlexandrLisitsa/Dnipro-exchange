@@ -27,10 +27,11 @@ public class StateMachineService {
     @Autowired
     private List<Transition> transitions;
 
-    public void initStateMachine(String userId, long chatId) {
+    public void initStateMachine(String userId, long chatId, String phone) {
         StateMachine<State, Event> stateMachine = stateMachineFactory.getStateMachine();
 
         stateMachine.getExtendedState().getVariables().put("chatId", chatId);
+        stateMachine.getExtendedState().getVariables().put("phone", phone);
 
         stateMachine.sendEvent(
                 Mono.just(MessageBuilder.withPayload(Event.MAIN_MENU).build())).subscribe();

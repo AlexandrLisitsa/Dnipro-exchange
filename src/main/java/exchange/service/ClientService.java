@@ -48,7 +48,7 @@ public class ClientService {
         String userName = update.getMessage().getChat().getUserName();
         Long chatId = update.getMessage().getChat().getId();
         if (isClientExists(phoneNumber)) {
-            stateMachineService.initStateMachine(userName, chatId);
+            stateMachineService.initStateMachine(userName, chatId, phoneNumber);
         } else {
             createClientAndStart(phoneNumber, userName, chatId);
         }
@@ -57,7 +57,7 @@ public class ClientService {
     private void createClientAndStart(String phoneNumber, String userName, Long chatId) {
         boolean isCreated = clientHttpService.createClient(phoneNumber);
         if (isCreated) {
-            stateMachineService.initStateMachine(userName, chatId);
+            stateMachineService.initStateMachine(userName, chatId, phoneNumber);
         } else {
             sendClientCreationErrorMessage(chatId);
         }
