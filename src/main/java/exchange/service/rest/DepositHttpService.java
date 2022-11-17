@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,9 +22,12 @@ public class DepositHttpService extends HttpService {
         return response.getBody();
     }
 
-    public String createDeposit(String phone, String currency, String amount) {
+    public boolean createDeposit(String phone, String currency, String amount) {
         String url = getApiUrlWithToken() + "/deposit/create";
         log.debug("Deposit create URL: " + url);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Type", "application/json");
 
         JsonObject depositBody = new JsonObject();
         depositBody.add("phone", new JsonPrimitive(phone));
@@ -31,7 +35,7 @@ public class DepositHttpService extends HttpService {
         depositBody.add("amount", new JsonPrimitive(amount));
         log.debug("Deposit body: " + depositBody);
 
-        HttpEntity<Object> body = new HttpEntity<>(depositBody.toString());
+        HttpEntity<Object> body = new HttpEntity<>(depositBody.toString(), httpHeaders);
 
         ResponseEntity<String> response = getRestTemplate().exchange(
                 url,
@@ -40,12 +44,7 @@ public class DepositHttpService extends HttpService {
                 String.class
         );
 
-        return "There should be a ticket";
-    }
-
-    @PostConstruct
-    public void test() {
-        createDeposit("+380634410488","USD", "1234");
+        return response.getStatusCode().is2xxSuccessful();
     }
 
 }

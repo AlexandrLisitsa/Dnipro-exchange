@@ -22,14 +22,13 @@ public class BankHttpService extends HttpService {
         ResponseEntity<String> bankRatesResponse = getRestTemplate().getForEntity(url, String.class);
 
         JsonElement ratesData = JsonParser.parseString(bankRatesResponse.getBody());
-        Map<String, JsonElement> currencyMap = ratesData.getAsJsonObject().get("rates").getAsJsonObject().asMap();
+        Map<String, JsonElement> currencyMap = ratesData.getAsJsonArray().get(0).getAsJsonObject().asMap();
         Map<String, BankValue> bankValues = new HashMap<>();
         currencyMap.forEach((currency, value) -> {
             BigDecimal buy = new BigDecimal(value.getAsJsonObject().get("buy").toString().replaceAll("\"",""));
             BigDecimal sell = new BigDecimal(value.getAsJsonObject().get("sell").toString().replaceAll("\"",""));
-            String updated = value.getAsJsonObject().get("updated_at").toString().replaceAll("\"","");
 
-            BankValue currencyValue = new BankValue(buy, sell, updated);
+            BankValue currencyValue = new BankValue(buy, sell);
             bankValues.put(currency, currencyValue);
         });
         return bankValues;
@@ -40,7 +39,6 @@ public class BankHttpService extends HttpService {
     public static class BankValue {
         private BigDecimal buy;
         private BigDecimal sell;
-        private String updated;
     }
 
 }

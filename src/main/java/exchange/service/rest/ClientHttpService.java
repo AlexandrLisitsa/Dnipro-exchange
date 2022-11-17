@@ -9,13 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,10 +26,16 @@ public class ClientHttpService extends HttpService {
         JsonObject phoneJson = new JsonObject();
         phoneJson.add("phone", new JsonPrimitive(phoneNumber));
 
-        HttpEntity<Object> body = new HttpEntity<>(phoneJson.toString());
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Type", "application/json");
+
+        HttpEntity<Object> body = new HttpEntity<>(phoneJson.toString(), httpHeaders);
+
+        String url = getApiUrlWithToken() + "/client/create";
+        log.debug("Create client URL: " + url);
 
         ResponseEntity<String> createResult = getRestTemplate().exchange(
-                getApiUrl(),
+                url,
                 HttpMethod.POST,
                 body,
                 String.class
@@ -42,7 +44,7 @@ public class ClientHttpService extends HttpService {
         return createResult.getStatusCode() == HttpStatus.OK;
     }
 
-    public ClientInfo getClientInfo(String phoneNumber) throws ClientNotFoundException {
+    public Client getClientInfo(String phoneNumber) throws ClientNotFoundException {
         String url = getApiUrlWithToken() + "/client/" + phoneNumber;
         log.debug("Client info URL: " + url);
         ResponseEntity<Client> clientInfoResponse = getRestTemplate().getForEntity(url, Client.class);
@@ -51,7 +53,7 @@ public class ClientHttpService extends HttpService {
             throw new ClientNotFoundException("Client with number " + phoneNumber + "doesn't exist.");
         }
 
-        return Objects.requireNonNull(clientInfoResponse.getBody()).getClient();
+        return Objects.requireNonNull(clientInfoResponse.getBody());
     }
 
     public Map<String, CurrencyValue> getClientRates(String phoneNumber) {
@@ -80,12 +82,7 @@ public class ClientHttpService extends HttpService {
     }
 
     @Data
-    private static class Client {
-        private ClientInfo client;
-    }
-
-    @Data
-    public static class ClientInfo {
+    public static class Client {
         private String phone;
         private double discount;
         private double fine;
