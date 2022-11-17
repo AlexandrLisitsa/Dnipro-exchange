@@ -27,4 +27,8 @@ public abstract class Transition implements Action<State, Event> {
         return (Payload) context.getExtendedState().getVariables().get("payload");
     }
 
+    public String getPhone(StateContext<State, Event> context){
+        return (String) context.getExtendedState().getVariables().get("phone");
+    }
+
 }

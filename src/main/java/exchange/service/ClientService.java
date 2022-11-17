@@ -72,14 +72,19 @@ public class ClientService {
     }
 
     private boolean isClientExists(String phoneNumber) {
-        ClientHttpService.ClientInfo clientInfo = null;
+        ClientHttpService.Client client = null;
         try {
-            clientInfo = clientHttpService.getClientInfo(phoneNumber);
+            client = clientHttpService.getClientInfo(phoneNumber);
         } catch (ClientHttpService.ClientNotFoundException e) {
             log.error("Error getting client info by number:" + phoneNumber, e);
             return false;
         }
-        return clientInfo.getPhone().equalsIgnoreCase(phoneNumber);
+
+        if(client == null){
+            return false;
+        }
+
+        return client.getPhone().equalsIgnoreCase(phoneNumber);
     }
 
     public void sendAuthorizationRequest(Update update) {

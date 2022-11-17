@@ -54,12 +54,6 @@ public class BankRates extends Transition {
             ratesMessage.append("Продажа: ").append(values.getSell()).append("\n\n");
         });
 
-        bankRates.values().stream()
-                .findFirst()
-                .ifPresent(bankValue -> {
-                    ratesMessage.append("Курс был обновлен: ").append(bankValue.getUpdated()).append("\n\n");
-                });
-
         InlineKeyboardButton mainMenuButton = InlineKeyboardButton.builder()
                 .text("Назад")
                 .callbackData(Event.MAIN_MENU.toString())
