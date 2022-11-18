@@ -15,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -72,19 +73,12 @@ public class ClientService {
     }
 
     private boolean isClientExists(String phoneNumber) {
-        ClientHttpService.Client client = null;
-        try {
-            client = clientHttpService.getClientInfo(phoneNumber);
-        } catch (ClientHttpService.ClientNotFoundException e) {
-            log.error("Error getting client info by number:" + phoneNumber, e);
-            return false;
+        Optional<ClientHttpService.Client> clientInfo = clientHttpService.getClientInfo(phoneNumber);
+        if (clientInfo.isPresent()) {
+            return clientInfo.get().getPhone().equalsIgnoreCase(phoneNumber);
         }
-
-        if(client == null){
-            return false;
-        }
-
-        return client.getPhone().equalsIgnoreCase(phoneNumber);
+        log.error("Error getting client info by number:" + phoneNumber);
+        return false;
     }
 
     public void sendAuthorizationRequest(Update update) {
