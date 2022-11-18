@@ -2,7 +2,6 @@ package exchange.statemachine.transitions;
 
 import exchange.service.rest.ClientHttpService;
 import exchange.statemachine.Event;
-import exchange.statemachine.Payload;
 import exchange.statemachine.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
@@ -13,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 @WithStateMachine
 public class MyRates extends Transition {
@@ -45,7 +45,15 @@ public class MyRates extends Transition {
     @Override
     public void execute(StateContext<State, Event> context) {
         String phone = (String) context.getExtendedState().getVariables().get("phone");
-        Map<String, ClientHttpService.CurrencyValue> clientRates = clientHttpService.getClientRates(phone);
+        Optional<ClientHttpService.Client> client = clientHttpService.getClientInfo(phone);
+        if (client.isPresent()) {
+            displayRates(client.get().getRates(), getPayload(context).getChatId());
+        } else {
+            goToMainMenu(context, "Клиент не найден");
+        }
+    }
+
+    private void displayRates(Map<String, ClientHttpService.CurrencyValue> clientRates, String chatId) {
 
         StringBuilder ratesMessage = new StringBuilder("<<< Мои курсы >>>").append("\n\n");
         clientRates.forEach((currency, values) -> {
@@ -61,8 +69,7 @@ public class MyRates extends Transition {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         markup.setKeyboard(Collections.singletonList(Collections.singletonList(mainMenuButton)));
 
-        Payload payload = (Payload) context.getExtendedState().getVariables().get("payload");
-
-        botService.sendMessage(payload.getChatId(), ratesMessage.toString(), markup);
+        botService.sendMessage(chatId, ratesMessage.toString(), markup);
     }
+
 }
