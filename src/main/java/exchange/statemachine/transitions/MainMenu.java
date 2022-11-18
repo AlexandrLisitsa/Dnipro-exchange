@@ -40,6 +40,10 @@ public class MainMenu extends Transition {
         rates.setText("Курсы валют");
         rates.setCallbackData(Event.BANK_RATES.toString());
 
+        InlineKeyboardButton depositRules = new InlineKeyboardButton();
+        depositRules.setText("Правила Депозита");
+        depositRules.setCallbackData(Event.DEPOSIT_RULES.toString());
+
         InlineKeyboardButton deposit = new InlineKeyboardButton();
         deposit.setText("Депозит");
         deposit.setCallbackData(Event.CREATE_DEPOSIT.toString());
@@ -50,9 +54,7 @@ public class MainMenu extends Transition {
 
         /*
 
-        InlineKeyboardButton rules = new InlineKeyboardButton();
-        rules.setText("Правила");
-        rules.setCallbackData("1");
+
 
         InlineKeyboardButton cryptoExchange = new InlineKeyboardButton();
         cryptoExchange.setText("Криптообмен");
@@ -73,15 +75,16 @@ public class MainMenu extends Transition {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> buttons = Arrays.asList(
                 //Collections.singletonList(exchange),
-                 Collections.singletonList(myRates),
+                Collections.singletonList(myRates),
                 Collections.singletonList(rates),
+                Collections.singletonList(depositRules),
                 Collections.singletonList(deposit)
                /* Collections.singletonList(deposit),
                 Collections.singletonList(cryptoExchange),
                 Collections.singletonList(inviteFriend),
                 Collections.singletonList(balance),
                 Collections.singletonList(exchangeHistory),
-                Collections.singletonList(rules)*/);
+                */);
         inlineKeyboardMarkup.setKeyboard(buttons);
 
         long chatId = (long) context.getExtendedState().getVariables().get("chatId");

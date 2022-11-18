@@ -1,6 +1,8 @@
 package exchange.service.rest;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -8,8 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 
 @Slf4j
 @Service
@@ -19,7 +19,14 @@ public class DepositHttpService extends HttpService {
         String url = getApiUrlWithToken() + "/deposit/rules";
         log.debug("Deposit rules URL: " + url);
         ResponseEntity<String> response = getRestTemplate().getForEntity(url, String.class);
-        return response.getBody();
+
+        JsonElement jsonElement = JsonParser.parseString(response.getBody());
+        String rules = jsonElement.getAsJsonObject().get("data")
+                .getAsJsonObject().get("settings")
+                .getAsJsonObject()
+                .get("text").getAsString();
+
+        return rules;
     }
 
     public boolean createDeposit(String phone, String currency, String amount) {
