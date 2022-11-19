@@ -16,7 +16,7 @@ import java.util.Collections;
 
 public abstract class Transition implements Action<State, Event> {
 
-    private MainMenu mainMenu;
+    public MainMenu mainMenu;
 
     @Autowired
     public void setMainMenu(@Lazy MainMenu mainMenu) {
