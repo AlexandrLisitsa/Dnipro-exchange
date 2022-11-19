@@ -71,6 +71,7 @@ public class StateMachineService {
                     null);
             transition.execute(stateEventDefaultStateContext);
         }
+        persistStateMachine(stateMachine, payload.getUserId());
     }
 
     private StateMachine<State, Event> restoreStateMachine(String userId) {
