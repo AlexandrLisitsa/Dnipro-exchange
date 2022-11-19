@@ -1,8 +1,11 @@
-package exchange.statemachine.transitions;
+package exchange.statemachine.transitions.exchange;
 
+import exchange.service.rest.ExchangeHttpService;
 import exchange.statemachine.Event;
 import exchange.statemachine.Payload;
 import exchange.statemachine.State;
+import exchange.statemachine.transitions.MainMenu;
+import exchange.statemachine.transitions.Transition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.annotation.WithStateMachine;
@@ -13,11 +16,15 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @WithStateMachine
 public class Exchange extends Transition {
 
+    @Autowired
+    private ExchangeHttpService exchangeHttpService;
     @Autowired
     private MainMenu mainMenuAction;
     private List<String> banknotes = Arrays.asList("USD", "UAH", "EUR", "PLN");
@@ -68,14 +75,28 @@ public class Exchange extends Transition {
             }
         }
 
-        String response = "Обмен " + from + " на " + to;
-        List<List<InlineKeyboardButton>> backButton = Arrays.asList(Arrays.asList(InlineKeyboardButton.builder()
-                .text("Назад")
-                .callbackData(Event.MAIN_MENU.toString())
-                .build()));
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        inlineKeyboardMarkup.setKeyboard(backButton);
-        botService.sendMessage(payload.getChatId(), response, inlineKeyboardMarkup);
+        String direction = from + "->" + to;
+        ExchangeHttpService.CommitExchangeResponse commitExchangeResponse = exchangeHttpService.commitExchange(getPhone(context), direction, payload.getContext());
+        context.getExtendedState().getVariables().put("exchange", commitExchangeResponse);
+        handleExchangeResponse(commitExchangeResponse, from, to, context);
+    }
+
+    private void handleExchangeResponse(ExchangeHttpService.CommitExchangeResponse response, String from, String to, StateContext<State, Event> context) {
+        String exchangeMessage = "Обмен " + getPayload(context).getContext() + " " + from + " на " + to;
+        List<ExchangeHttpService.Exchanger> exchangers = response.getAvaliable_exchangers();
+        if (exchangers.isEmpty()) {
+            goToMainMenu(context, exchangeMessage + "\nЗапрашиваемой суммы нет в наличии, с Вами свяжутся.");
+        } else {
+            List<List<InlineKeyboardButton>> exchangerPoints = exchangers.stream().map(exchanger -> {
+                InlineKeyboardButton exchangerButton = InlineKeyboardButton.builder()
+                        .callbackData(Event.CONFIRM_EXCHANGE + ";" + exchanger.getId())
+                        .text(exchanger.getTitle())
+                        .build();
+                return Collections.singletonList(exchangerButton);
+            }).collect(Collectors.toList());
+            InlineKeyboardMarkup markup = InlineKeyboardMarkup.builder().keyboard(exchangerPoints).build();
+            botService.sendMessage(getPayload(context).getChatId(), "Выберите кассу для обмена", markup);
+        }
     }
 
     private void displayButtons(StateContext<State, Event> context) {
