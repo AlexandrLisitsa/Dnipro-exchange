@@ -12,7 +12,7 @@ import java.time.Duration;
 @Data
 public class HttpService {
 
-    @Value("${accessToken}")
+    @Value("${api.token}")
     protected String accessToken;
     @Value("${api.url}")
     protected String apiUrl;
