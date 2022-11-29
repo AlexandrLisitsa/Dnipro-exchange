@@ -1,5 +1,7 @@
 package exchange.service;
 
+import exchange.db.entity.Client;
+import exchange.db.repository.UserRepo;
 import exchange.service.rest.ClientHttpService;
 import exchange.statemachine.StateMachineService;
 import exchange.telegram.BotService;
@@ -34,6 +36,9 @@ public class ClientService {
     @Autowired
     private StateMachineService stateMachineService;
 
+    @Autowired
+    private UserRepo userRepo;
+
     public boolean isUserIdPresent(Update update) {
         return update.getMessage().getChat().getUserName() != null;
     }
@@ -45,14 +50,27 @@ public class ClientService {
     }
 
     public void handleClient(Update update) {
-        String phoneNumber = "+" + update.getMessage().getContact().getPhoneNumber();
+        String phoneNumber = update.getMessage().getContact().getPhoneNumber();
         String userName = update.getMessage().getChat().getUserName();
         Long chatId = update.getMessage().getChat().getId();
         if (isClientExists(phoneNumber)) {
             stateMachineService.initStateMachine(userName, chatId, phoneNumber);
+            updateOrCreateClient(String.valueOf(chatId), userName, phoneNumber);
         } else {
             createClientAndStart(phoneNumber, userName, chatId);
         }
+    }
+
+    private void updateOrCreateClient(String chatId, String userId, String phone) {
+        Client client = userRepo.getClientByUserId(userId);
+        if (client == null) {
+            client = new Client();
+            client.setUserId(userId);
+        }
+        client.setChatId(chatId);
+        client.setPhone(phone);
+
+        userRepo.save(client);
     }
 
     private void createClientAndStart(String phoneNumber, String userName, Long chatId) {
