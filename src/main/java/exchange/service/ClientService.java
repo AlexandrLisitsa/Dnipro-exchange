@@ -50,7 +50,8 @@ public class ClientService {
     }
 
     public void handleClient(Update update) {
-        String phoneNumber = update.getMessage().getContact().getPhoneNumber();
+        String phoneNumber = getPhoneNumber(update);
+        log.info("Clients number: " + phoneNumber);
         String userName = update.getMessage().getChat().getUserName();
         Long chatId = update.getMessage().getChat().getId();
         if (isClientExists(phoneNumber)) {
@@ -59,6 +60,14 @@ public class ClientService {
         } else {
             createClientAndStart(phoneNumber, userName, chatId);
         }
+    }
+
+    private String getPhoneNumber(Update update) {
+        String phoneNumber = update.getMessage().getContact().getPhoneNumber();
+        if (!phoneNumber.contains("+")) {
+            phoneNumber = "+" + phoneNumber;
+        }
+        return phoneNumber;
     }
 
     private void updateOrCreateClient(String chatId, String userId, String phone) {

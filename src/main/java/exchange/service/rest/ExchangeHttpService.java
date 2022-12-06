@@ -22,7 +22,7 @@ public class ExchangeHttpService extends HttpService {
 
     public boolean confirmExchange(Operation operation, int exchangerId) {
         String url = getApiUrlWithToken() + "/operation/confirm";
-        log.debug("Request operation confirm: " + url);
+        log.info("Request operation confirm: " + url);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/json");
@@ -30,7 +30,7 @@ public class ExchangeHttpService extends HttpService {
         JsonObject body = new JsonObject();
         body.add("operation", gson.toJsonTree(operation));
         body.add("exchanger_id", new JsonPrimitive(exchangerId));
-        log.debug("operation confirm body: " + body);
+        log.info("operation confirm body: " + body);
 
         HttpEntity<String> request = new HttpEntity<>(body.toString(), httpHeaders);
 
@@ -46,7 +46,7 @@ public class ExchangeHttpService extends HttpService {
 
     public CommitExchangeResponse commitExchange(String phone, String direction, String amount) {
         String url = getApiUrlWithToken() + "/operation/create";
-        log.debug("Requesting operation commit: " + url);
+        log.info("Requesting operation commit: " + url);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/json");
@@ -58,7 +58,7 @@ public class ExchangeHttpService extends HttpService {
 
         HttpEntity<Object> request = new HttpEntity<>(operationCommitBody.toString(), httpHeaders);
 
-        log.debug("operation commit body: " + operationCommitBody);
+        log.info("operation commit body: " + operationCommitBody);
 
         ResponseEntity<String> response = getRestTemplate().exchange(
                 url,
@@ -68,7 +68,7 @@ public class ExchangeHttpService extends HttpService {
         );
 
         CommitExchangeResponse commitExchangeResponse = extractCommitResponse(response.getBody());
-        log.debug(commitExchangeResponse.toString());
+        log.info(commitExchangeResponse.toString());
 
         return commitExchangeResponse;
     }

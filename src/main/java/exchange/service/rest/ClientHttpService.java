@@ -28,7 +28,7 @@ public class ClientHttpService extends HttpService {
         HttpEntity<Object> body = new HttpEntity<>(phoneJson.toString(), httpHeaders);
 
         String url = getApiUrlWithToken() + "/client/create";
-        log.debug("Create client URL: " + url);
+        log.info("Create client URL: " + url);
 
         ResponseEntity<String> createResult = getRestTemplate().exchange(
                 url,
@@ -43,7 +43,7 @@ public class ClientHttpService extends HttpService {
     public Optional<Client> getClientInfo(String phoneNumber) {
         String url = getApiUrlWithToken() + "/client/" + phoneNumber;
         ResponseEntity<Client> clientInfoResponse = null;
-        log.debug("Client info URL: " + url);
+        log.info("Client info URL: " + url);
         try {
             clientInfoResponse = getRestTemplate().getForEntity(url, Client.class);
         } catch (Exception e) {

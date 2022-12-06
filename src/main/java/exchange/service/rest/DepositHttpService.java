@@ -17,7 +17,7 @@ public class DepositHttpService extends HttpService {
 
     public String getDepositRules() {
         String url = getApiUrlWithToken() + "/deposit/rules";
-        log.debug("Deposit rules URL: " + url);
+        log.info("Deposit rules URL: " + url);
         ResponseEntity<String> response = getRestTemplate().getForEntity(url, String.class);
 
         JsonElement jsonElement = JsonParser.parseString(response.getBody());
@@ -31,7 +31,7 @@ public class DepositHttpService extends HttpService {
 
     public boolean createDeposit(String phone, String currency, String amount) {
         String url = getApiUrlWithToken() + "/deposit/create";
-        log.debug("Deposit create URL: " + url);
+        log.info("Deposit create URL: " + url);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/json");
@@ -40,7 +40,7 @@ public class DepositHttpService extends HttpService {
         depositBody.add("phone", new JsonPrimitive(phone));
         depositBody.add("currency", new JsonPrimitive(currency));
         depositBody.add("amount", new JsonPrimitive(amount));
-        log.debug("Deposit body: " + depositBody);
+        log.info("Deposit body: " + depositBody);
 
         HttpEntity<Object> body = new HttpEntity<>(depositBody.toString(), httpHeaders);
 

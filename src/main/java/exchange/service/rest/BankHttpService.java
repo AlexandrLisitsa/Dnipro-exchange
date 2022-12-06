@@ -18,7 +18,7 @@ public class BankHttpService extends HttpService {
 
     public Map<String, BankValue> getBankRates() {
         String url = getApiUrlWithToken() + "/rates";
-        log.debug("Bank rates URL: " + url);
+        log.info("Bank rates URL: " + url);
         ResponseEntity<String> bankRatesResponse = getRestTemplate().getForEntity(url, String.class);
 
         JsonElement ratesData = JsonParser.parseString(bankRatesResponse.getBody());
