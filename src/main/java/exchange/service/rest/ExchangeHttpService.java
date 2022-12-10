@@ -105,6 +105,15 @@ public class ExchangeHttpService extends HttpService {
     public static class Exchanger {
         private int id;
         private String title;
+        private boolean enough;
+        private Time time_bounds;
+    }
+
+    @Data
+    public static class Time {
+        private boolean today;
+        private String from;
+        private String to;
     }
 
     @Data
@@ -112,6 +121,9 @@ public class ExchangeHttpService extends HttpService {
         private int client;
         private String direction;
         private double amount;
+        private double discount;
+        private double receive;
+        private double rate;
     }
 
 }

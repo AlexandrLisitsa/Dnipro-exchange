@@ -14,10 +14,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageRe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @WithStateMachine
@@ -88,15 +85,48 @@ public class Exchange extends Transition {
             goToMainMenu(context, exchangeMessage + "\nЗапрашиваемой суммы нет в наличии, с Вами свяжутся.");
         } else {
             List<List<InlineKeyboardButton>> exchangerPoints = exchangers.stream().map(exchanger -> {
-                InlineKeyboardButton exchangerButton = InlineKeyboardButton.builder()
-                        .callbackData(Event.CONFIRM_EXCHANGE + ";" + exchanger.getId())
-                        .text(exchanger.getTitle())
-                        .build();
-                return Collections.singletonList(exchangerButton);
-            }).collect(Collectors.toList());
+                if (exchanger.isEnough()) {
+                    InlineKeyboardButton exchangerButton = InlineKeyboardButton.builder()
+                            .callbackData(Event.CONFIRM_EXCHANGE + ";" + exchanger.getId())
+                            .text(buildExchangerMessage(exchanger))
+                            .build();
+                    return Collections.singletonList(exchangerButton);
+                } else {
+                    return null;
+                }
+            }).filter(Objects::nonNull).collect(Collectors.toList());
             InlineKeyboardMarkup markup = InlineKeyboardMarkup.builder().keyboard(exchangerPoints).build();
-            botService.sendMessage(getPayload(context).getChatId(), "Выберите кассу для обмена", markup);
+
+            if (exchangerPoints.isEmpty()) {
+                botService.sendMessage(getPayload(context).getChatId(), "С Вами свяжется оператор \nНет доступных касс для обмена");
+            } else {
+                botService.sendMessage(getPayload(context).getChatId(), buildExchangeConfirmMessage(response.getOperation()), markup);
+            }
         }
+    }
+
+    private String buildExchangeConfirmMessage(ExchangeHttpService.Operation operation) {
+        StringBuilder operationText = new StringBuilder();
+
+        operationText.append("Операция: ").append("\n");
+        operationText.append(operation.getDirection()).append(" К выдаче: ").append(operation.getReceive()).append("\n\n");
+        operationText.append("Для подтверждения операции выберите кассу");
+        return operationText.toString();
+    }
+
+    private String buildExchangerMessage(ExchangeHttpService.Exchanger exchanger) {
+        StringBuilder stringBuilder = new StringBuilder(exchanger.getTitle()).append("\n");
+        if (!exchanger.isEnough()) {
+            ExchangeHttpService.Time timeBounds = exchanger.getTime_bounds();
+            if (timeBounds.isToday()) {
+                stringBuilder
+                        .append("Сегодня с ")
+                        .append(timeBounds.getFrom())
+                        .append(" по ")
+                        .append(timeBounds.getTo());
+            }
+        }
+        return stringBuilder.toString();
     }
 
     private void displayButtons(StateContext<State, Event> context) {
