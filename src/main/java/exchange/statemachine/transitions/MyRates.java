@@ -49,17 +49,17 @@ public class MyRates extends Transition {
         if (client.isPresent()) {
             displayRates(client.get().getRates(), getPayload(context).getChatId());
         } else {
-            goToMainMenu(context, "Клиент не найден");
+            goToMainMenu(context, "Кліент не знайден");
         }
     }
 
     private void displayRates(Map<String, ClientHttpService.CurrencyValue> clientRates, String chatId) {
 
-        StringBuilder ratesMessage = new StringBuilder("<<< Мои курсы >>>").append("\n\n");
+        StringBuilder ratesMessage = new StringBuilder("<<< Мої курси >>>").append("\n\n");
         clientRates.forEach((currency, values) -> {
             ratesMessage.append("         ").append(currency.toUpperCase()).append("\n");
-            ratesMessage.append("Покупка: ").append(values.getBuy()).append("\n");
-            ratesMessage.append("Продажа: ").append(values.getSell()).append("\n\n");
+            ratesMessage.append("Купівля: ").append(values.getBuy()).append("\n");
+            ratesMessage.append("Продаж: ").append(values.getSell()).append("\n\n");
         });
 
         InlineKeyboardButton mainMenuButton = InlineKeyboardButton.builder()

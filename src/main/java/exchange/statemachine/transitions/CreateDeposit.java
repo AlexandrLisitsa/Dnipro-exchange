@@ -76,9 +76,9 @@ public class CreateDeposit extends Transition {
         String response = null;
 
         if (isCreated) {
-            response = "Запрос на депозит " + amount + " " + currencyToDeposit + " был успешно создан.";
+            response = "Запит на депозит " + amount + " " + currencyToDeposit + " був вдало створен.";
         }else{
-            response = "Ошибки при создании депозита";
+            response = "Помилка створення депозиту";
         }
 
         List<List<InlineKeyboardButton>> backButton = Arrays.asList(Arrays.asList(InlineKeyboardButton.builder()

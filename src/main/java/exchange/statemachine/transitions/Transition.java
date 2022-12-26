@@ -44,7 +44,7 @@ public abstract class Transition implements Action<State, Event> {
 
     public void goToMainMenu(StateContext<State, Event> context, String message) {
         InlineKeyboardButton mainMenuButton = InlineKeyboardButton.builder()
-                .text("Главное меню")
+                .text("Головне меню")
                 .callbackData(Event.MAIN_MENU.toString())
                 .build();
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();

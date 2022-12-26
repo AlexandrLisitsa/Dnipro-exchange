@@ -39,9 +39,9 @@ public class ConfirmExchange extends Transition {
     public void execute(StateContext<State, Event> context) {
         ExchangeHttpService.CommitExchangeResponse exchangeResponse = (ExchangeHttpService.CommitExchangeResponse) context.getExtendedState().getVariables().get("exchange");
         if (exchangeHttpService.confirmExchange(exchangeResponse.getOperation(), Integer.parseInt(getPayload(context).getContext()))) {
-            goToMainMenu(context, "Операция успешно подтверждена.");
+            goToMainMenu(context, "Операція успішно підтвердженна.");
         } else {
-            goToMainMenu(context, "Ошибка подтверждения операции");
+            goToMainMenu(context, "Помилка підтвердження операції.");
         }
     }
 }

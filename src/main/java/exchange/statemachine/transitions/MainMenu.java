@@ -33,19 +33,19 @@ public class MainMenu extends Transition {
     public void execute(StateContext<State, Event> context) {
 
         InlineKeyboardButton myRates = new InlineKeyboardButton();
-        myRates.setText("Мой курс");
+        myRates.setText("Мій курс");
         myRates.setCallbackData(Event.MY_RATES.toString());
 
         InlineKeyboardButton rates = new InlineKeyboardButton();
-        rates.setText("Курсы валют");
+        rates.setText("Курси валют");
         rates.setCallbackData(Event.BANK_RATES.toString());
 
         InlineKeyboardButton exchange = new InlineKeyboardButton();
-        exchange.setText("Обменять");
+        exchange.setText("Обміняти");
         exchange.setCallbackData(Event.EXCHANGE.toString());
 
         InlineKeyboardButton depositRules = new InlineKeyboardButton();
-        depositRules.setText("Правила Депозита");
+        depositRules.setText("Правила депозита");
         depositRules.setCallbackData(Event.DEPOSIT_RULES.toString());
 
         InlineKeyboardButton deposit = new InlineKeyboardButton();
@@ -86,7 +86,7 @@ public class MainMenu extends Transition {
 
         long chatId = (long) context.getExtendedState().getVariables().get("chatId");
 
-        botService.sendMessage(String.valueOf(chatId), "<<< Главное меню >>>", inlineKeyboardMarkup);
+        botService.sendMessage(String.valueOf(chatId), "<<< Головне меню >>>", inlineKeyboardMarkup);
     }
 
 }

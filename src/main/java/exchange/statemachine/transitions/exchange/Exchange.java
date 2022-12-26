@@ -79,10 +79,10 @@ public class Exchange extends Transition {
     }
 
     private void handleExchangeResponse(ExchangeHttpService.CommitExchangeResponse response, String from, String to, StateContext<State, Event> context) {
-        String exchangeMessage = "Обмен " + getPayload(context).getContext() + " " + from + " на " + to;
+        String exchangeMessage = "Обмін " + getPayload(context).getContext() + " " + from + " на " + to;
         List<ExchangeHttpService.Exchanger> exchangers = response.getAvaliable_exchangers();
         if (exchangers.isEmpty()) {
-            goToMainMenu(context, exchangeMessage + "\nЗапрашиваемой суммы нет в наличии, с Вами свяжутся.");
+            goToMainMenu(context, exchangeMessage + "\nЗапитуваємої суми немає в наявності, з Вами зв'яжуться.");
         } else {
             List<List<InlineKeyboardButton>> exchangerPoints = exchangers.stream().map(exchanger -> {
                 if (exchanger.isEnough()) {
@@ -98,7 +98,9 @@ public class Exchange extends Transition {
             InlineKeyboardMarkup markup = InlineKeyboardMarkup.builder().keyboard(exchangerPoints).build();
 
             if (exchangerPoints.isEmpty()) {
-                botService.sendMessage(getPayload(context).getChatId(), "С Вами свяжется оператор \nНет доступных касс для обмена");
+                botService.sendMessage(getPayload(context).getChatId(), "Наразі в обраному обміннику недостатньо коштів для здійснення операції." +
+                        " Ви зможете здійснити операцію сьогодні з 18:00 до 19:30 або завтра з 08:30 до 12:00.\n" +
+                        "Або оберіть інший обмінник. ");
             } else {
                 botService.sendMessage(getPayload(context).getChatId(), buildExchangeConfirmMessage(response.getOperation()), markup);
             }
@@ -108,9 +110,9 @@ public class Exchange extends Transition {
     private String buildExchangeConfirmMessage(ExchangeHttpService.Operation operation) {
         StringBuilder operationText = new StringBuilder();
 
-        operationText.append("Операция: ").append("\n");
-        operationText.append(operation.getDirection()).append(" К выдаче: ").append(operation.getReceive()).append("\n\n");
-        operationText.append("Для подтверждения операции выберите кассу");
+        operationText.append("Операція: ").append("\n");
+        operationText.append(operation.getDirection()).append(" До видачі: ").append(operation.getReceive()).append("\n\n");
+        operationText.append("Оберіть зручний обмінник для здійснення операції");
         return operationText.toString();
     }
 
@@ -120,7 +122,7 @@ public class Exchange extends Transition {
             ExchangeHttpService.Time timeBounds = exchanger.getTime_bounds();
             if (timeBounds.isToday()) {
                 stringBuilder
-                        .append("Сегодня с ")
+                        .append("Сьогодні з ")
                         .append(timeBounds.getFrom())
                         .append(" по ")
                         .append(timeBounds.getTo());
@@ -159,7 +161,7 @@ public class Exchange extends Transition {
             context.getExtendedState().getVariables().put("exchangeKeys", keyboardButtons);
             botService.sendMessage(
                     payload.getChatId(),
-                    "<< Обмен >>",
+                    "<< Обмін >>",
                     inlineKeyboardMarkup
             );
         }
