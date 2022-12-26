@@ -47,11 +47,11 @@ public class BankRates extends Transition {
 
         Map<String, BankHttpService.BankValue> bankRates = bankHttpService.getBankRates();
 
-        StringBuilder ratesMessage = new StringBuilder("<<< Актуальный банковский курс >>>").append("\n\n");
+        StringBuilder ratesMessage = new StringBuilder("<<< Актуальний банківський курс >>>").append("\n\n");
         bankRates.forEach((currency, values) -> {
             ratesMessage.append("         ").append(currency.toUpperCase()).append("\n");
-            ratesMessage.append("Покупка: ").append(values.getBuy()).append("\n");
-            ratesMessage.append("Продажа: ").append(values.getSell()).append("\n\n");
+            ratesMessage.append("Купівля: ").append(values.getBuy()).append("\n");
+            ratesMessage.append("Продаж: ").append(values.getSell()).append("\n\n");
         });
 
         InlineKeyboardButton mainMenuButton = InlineKeyboardButton.builder()
