@@ -87,7 +87,7 @@ public class Exchange extends Transition {
             List<List<InlineKeyboardButton>> exchangerPoints = exchangers.stream().map(exchanger -> {
                 if (exchanger.isEnough()) {
                     InlineKeyboardButton exchangerButton = InlineKeyboardButton.builder()
-                            .callbackData(Event.CONFIRM_EXCHANGE + ";" + exchanger.getId())
+                            .callbackData(Event.CONFIRM_EXCHANGE + ";" + exchanger.getId() + "," + exchanger.isEnough())
                             .text(buildExchangerMessage(exchanger))
                             .build();
                     return Collections.singletonList(exchangerButton);

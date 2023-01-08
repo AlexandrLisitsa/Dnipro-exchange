@@ -111,7 +111,7 @@ public class ClientService {
     public void sendAuthorizationRequest(Update update) {
         SendMessage authMessage = new SendMessage();
         authMessage.setChatId(update.getMessage().getChatId());
-        authMessage.setText("Ваш номер телефона");
+        authMessage.setText("Для продовження відправте номер телефону.");
 
         // create keyboard
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
@@ -126,7 +126,7 @@ public class ClientService {
         // first keyboard line
         KeyboardRow keyboardFirstRow = new KeyboardRow();
         KeyboardButton keyboardButton = new KeyboardButton();
-        keyboardButton.setText("Отправить номер телефона.");
+        keyboardButton.setText("Відправити номер телефону.");
         keyboardButton.setRequestContact(true);
         keyboardFirstRow.add(keyboardButton);
 

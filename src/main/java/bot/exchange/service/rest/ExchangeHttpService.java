@@ -20,7 +20,7 @@ import java.util.List;
 @Service
 public class ExchangeHttpService extends HttpService {
 
-    public boolean confirmExchange(Operation operation, int exchangerId) {
+    public boolean confirmExchange(Operation operation, int exchangerId, boolean isEnough) {
         String url = getApiUrlWithToken() + "/operation/confirm";
         log.info("Request operation confirm: " + url);
 
@@ -30,6 +30,7 @@ public class ExchangeHttpService extends HttpService {
         JsonObject body = new JsonObject();
         body.add("operation", gson.toJsonTree(operation));
         body.add("exchanger_id", new JsonPrimitive(exchangerId));
+        body.add("enough", new JsonPrimitive(isEnough));
         log.info("operation confirm body: " + body);
 
         HttpEntity<String> request = new HttpEntity<>(body.toString(), httpHeaders);
