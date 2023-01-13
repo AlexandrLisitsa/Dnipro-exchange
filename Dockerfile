@@ -12,18 +12,11 @@ yes | apt-get upgrade && \
 yes | apt-get install zlib1g-dev && \
 yes | apt-get install libssl-dev && \
 #Install Java
-apt-get install openjdk-18-jdk -y \
-
-#Install Python
-RUN apt-get install python3 -y
-RUN apt-get install python3-pip -y
-
-#Install ner.py dependecnies
-RUN pip3 install spacy
-RUN python3 -m spacy download ru_core_news_md
+apt-get install openjdk-8-jdk -y
 
 #Setting up WORKDIR
-WORKDIR /tgcrawler
+WORKDIR /Dnipro-exchange
+RUN chmod 777 /Dnipro-exchange
 
 RUN mkdir -p log/
 RUN mkdir -p tdlib/
@@ -35,16 +28,12 @@ RUN chown tguser log/
 USER tguser
 
 #Add jar file generated via mvn 'cleaninstall spring-boot:repackage'
-#ADD ./target/tg-1.0-SNAPSHOT-spring-boot.jar tg-spring.jar
+ADD ./Dnipro-exchange-1.0-SNAPSHOT.jar tg-spring.jar
 #Add TDLib
-ADD /src/main/resources/libtdjni.so /TDLib/libtdjni.so
-#Add ner.py
-#ADD src/main/python/ner.py ner.py
+ADD ./libtdjni.so /TDLib/libtdjni.so
 
 #Expose ports outside of our docker image
 EXPOSE 8080
-EXPOSE 5432
-#EXPOSE 9243
 
 #Start application
-#CMD java -cp tg-spring.jar -Djava.library.path="/TDLib" -Xmx1200M -Dloader.main=net.broscorp.Application org.springframework.boot.loader.PropertiesLauncher
+CMD java -cp tg-spring.jar -Dspring.profiles.active=dev -Djava.library.path="/TDLib" -jar tg-spring.jar --bot.token=5499221266:AAGLtrFdvP4DEQTrapIc3GdJtek0KfM9r3Y --api.token=huyiCb9YZN30LFOcz5H7obc4Eu3WRfV0nMx3usjRUEKm53TObh4pxuQRdfs0u9zrql3jBRtJCMGt5xyl
