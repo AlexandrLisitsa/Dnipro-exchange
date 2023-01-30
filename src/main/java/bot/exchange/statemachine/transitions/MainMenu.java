@@ -51,7 +51,7 @@ public class MainMenu extends Transition {
 
         InlineKeyboardButton exchange = new InlineKeyboardButton();
         exchange.setText("Обміняти");
-        exchange.setCallbackData(Event.EXCHANGE.toString());
+        exchange.setCallbackData(Event.FROM_CURRENCY.toString());
 
         /*InlineKeyboardButton depositRules = new InlineKeyboardButton();
         depositRules.setText("Правила депозита");
