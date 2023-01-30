@@ -38,6 +38,10 @@ public abstract class Transition implements Action<State, Event> {
         return (Payload) context.getExtendedState().getVariables().get("payload");
     }
 
+    public long getChatId(StateContext<State, Event> context) {
+        return (long) context.getExtendedState().getVariables().get("chatId");
+    }
+
     public String getPhone(StateContext<State, Event> context) {
         return (String) context.getExtendedState().getVariables().get("phone");
     }
