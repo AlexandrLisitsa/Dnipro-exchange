@@ -4,11 +4,13 @@ import bot.exchange.service.rest.ExchangeHttpService;
 import bot.exchange.statemachine.Event;
 import bot.exchange.statemachine.State;
 import bot.exchange.statemachine.transitions.Transition;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.annotation.WithStateMachine;
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
 
+@Slf4j
 @WithStateMachine
 public class ConfirmExchange extends Transition {
 
@@ -37,19 +39,25 @@ public class ConfirmExchange extends Transition {
         Object exchangerId = context.getExtendedState().getVariables().get("exchangerId");
         Object isEnough = context.getExtendedState().getVariables().get("isEnough");
 
-        if (exchangeHttpService.confirmExchange(exchangeResponse.getOperation(), (Integer) exchangerId, (Boolean) isEnough)) {
-            String confirmationMessage = getConfirmationMessage(exchangeResponse);
+        try {
+            ExchangeHttpService.ConfirmExchangeResponse confirmExchangeResponse = exchangeHttpService.confirmExchange(
+                    exchangeResponse.getOperation(),
+                    (Integer) exchangerId,
+                    (Boolean) isEnough,
+                    exchangeResponse.getOperationTime());
+            String confirmationMessage = getConfirmationMessage(confirmExchangeResponse);
             goToMainMenu(context, confirmationMessage);
-        } else {
+        } catch (Exception e) {
+            log.error("Error confirming operation", e);
             goToMainMenu(context, "Помилка підтвердження операції.");
         }
     }
 
-    private String getConfirmationMessage(ExchangeHttpService.CommitExchangeResponse exchangeResponse) {
+    private String getConfirmationMessage(ExchangeHttpService.ConfirmExchangeResponse exchangeResponse) {
         StringBuilder confirmMessage = new StringBuilder();
         confirmMessage.append("Операція успішно підтверджена.").append("\n");
-        confirmMessage.append("Ваш код: ").append("[Api code]").append("\n\n");
-        confirmMessage.append("Курс зафіксовано до ").append("[time from server]")
+        confirmMessage.append("Ваш код: ").append(exchangeResponse.getId()).append("\n\n");
+        confirmMessage.append("Курс зафіксовано до ").append(exchangeResponse.getExpires_at())
                 .append(", після чого обмін буде виконано по поточному курсу на час здійснення операції.");
 
         return confirmMessage.toString();
