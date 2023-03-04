@@ -1,5 +1,8 @@
 package bot.exchange.telegram;
 
+import bot.commands.Command;
+import bot.commands.CommandHandler;
+import bot.commands.CommandPayload;
 import bot.exchange.service.ClientService;
 import bot.exchange.statemachine.Event;
 import bot.exchange.statemachine.Payload;
@@ -16,9 +19,14 @@ public class MessageProcessor {
     private StateMachineService stateMachineService;
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private CommandHandler commandHandler;
 
     public void process(Update update) {
-        if (update.hasCallbackQuery()) {
+        if (update.hasCallbackQuery() && update.getCallbackQuery().getData().startsWith("/")) {
+            CommandPayload commandPayload = getCommandPayload(update);
+            commandHandler.handleCommand(commandPayload);
+        } else if (update.hasCallbackQuery()) {
             Payload payload = processCallback(update);
             stateMachineService.changeState(payload);
         } else if (update.getMessage().getContact() != null) {
@@ -37,6 +45,23 @@ public class MessageProcessor {
         } else {
             clientService.sendIdentityErrorMessage(update);
         }
+    }
+
+    private CommandPayload getCommandPayload(Update update) {
+        CommandPayload commandPayload = new CommandPayload();
+
+        String chatId = String.valueOf(update.getCallbackQuery().getMessage().getChat().getId());
+        commandPayload.setChatId(chatId);
+
+        String data = update.getCallbackQuery().getData();
+        String[] split = data.split(";");
+
+        String command = split[0].replace("/", "");
+        commandPayload.setCommand(Command.valueOf(command));
+
+        commandPayload.setData(split[1]);
+
+        return commandPayload;
     }
 
     private Payload getPayload(Update update) {

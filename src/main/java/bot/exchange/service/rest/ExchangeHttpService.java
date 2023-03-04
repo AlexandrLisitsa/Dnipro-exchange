@@ -20,18 +20,26 @@ import java.util.List;
 @Service
 public class ExchangeHttpService extends HttpService {
 
-    public boolean confirmExchange(Operation operation, int exchangerId, boolean isEnough) {
-        String url = getApiUrlWithToken() + "/operation/confirm";
-        log.info("Request operation confirm: " + url);
+    public boolean rejectOperation(int code, String phone) {
+        String url = getApiUrlWithToken() + "/operation/cancel";
+        log.info("Request reject operation: " + url);
 
+        return sendProlongRejectRequest(code, phone, url);
+    }
+
+    public boolean prolongOperation(int code, String phone) {
+        String url = getApiUrlWithToken() + "/operation/extend";
+        log.info("Request prolong operation: " + url);
+
+        return sendProlongRejectRequest(code, phone, url);
+    }
+
+    private boolean sendProlongRejectRequest(int code, String phone, String url) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/json");
 
-        JsonObject body = new JsonObject();
-        body.add("operation", gson.toJsonTree(operation));
-        body.add("exchanger_id", new JsonPrimitive(exchangerId));
-        body.add("enough", new JsonPrimitive(isEnough));
-        log.info("operation confirm body: " + body);
+        JsonObject body = getProlongRejectBody(code, phone);
+        log.info("Body: " + body.toString());
 
         HttpEntity<String> request = new HttpEntity<>(body.toString(), httpHeaders);
 
@@ -43,6 +51,44 @@ public class ExchangeHttpService extends HttpService {
         );
 
         return response.getStatusCode().is2xxSuccessful();
+    }
+
+    private JsonObject getProlongRejectBody(int code, String phone) {
+        JsonObject body = new JsonObject();
+        body.add("operation_id", new JsonPrimitive(code));
+        body.add("phone", new JsonPrimitive(phone));
+        log.info("operation reject body: " + body);
+        return body;
+    }
+
+    public ConfirmExchangeResponse confirmExchange(Operation operation, int exchangerId, boolean isEnough, String expires) {
+        String url = getApiUrlWithToken() + "/operation/confirm";
+        log.info("Request operation confirm: " + url);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Type", "application/json");
+
+        JsonObject body = new JsonObject();
+        body.add("operation", gson.toJsonTree(operation));
+        body.add("exchanger_id", new JsonPrimitive(exchangerId));
+        body.add("enough", new JsonPrimitive(isEnough));
+        body.add("expires_at", new JsonPrimitive(expires));
+        log.info("operation confirm body: " + body);
+
+        HttpEntity<String> request = new HttpEntity<>(body.toString(), httpHeaders);
+
+        ResponseEntity<String> response = getRestTemplate().exchange(
+                url,
+                HttpMethod.POST,
+                request,
+                String.class
+        );
+
+        JsonElement jsonElement = JsonParser.parseString(response.getBody());
+        JsonElement result = jsonElement.getAsJsonObject().get("Result");
+        ConfirmExchangeResponse confirmExchangeResponse = gson.fromJson(result.toString(), ConfirmExchangeResponse.class);
+
+        return confirmExchangeResponse;
     }
 
     public CommitExchangeResponse commitExchange(String phone, String direction, String amount) {
@@ -97,9 +143,23 @@ public class ExchangeHttpService extends HttpService {
     }
 
     @Data
+    public static class ConfirmExchangeResponse {
+        private int id;
+        private String expires_at;
+    }
+
+    @Data
     public static class CommitExchangeResponse {
         private Operation operation;
         private List<Exchanger> avaliable_exchangers;
+
+        public String getOperationTime() {
+            return avaliable_exchangers.stream()
+                    .filter(ExchangeHttpService.Exchanger::isEnough)
+                    .map(ExchangeHttpService.Exchanger::getExpires_at)
+                    .findFirst()
+                    .orElse("");
+        }
     }
 
     @Data
@@ -108,6 +168,7 @@ public class ExchangeHttpService extends HttpService {
         private String title;
         private boolean enough;
         private Time time_bounds;
+        private String expires_at;
     }
 
     @Data

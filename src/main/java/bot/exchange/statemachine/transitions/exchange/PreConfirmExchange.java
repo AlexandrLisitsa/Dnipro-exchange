@@ -86,12 +86,13 @@ public class PreConfirmExchange extends Transition {
 
     private String getOperationDetails(ExchangeHttpService.CommitExchangeResponse response) {
         ExchangeHttpService.Operation operation = response.getOperation();
+        List<ExchangeHttpService.Exchanger> exchangers = response.getAvaliable_exchangers();
         StringBuilder confirmMessage = new StringBuilder();
-        confirmMessage.append("Напрят обміну: ").append(operation.getDirection()).append("\n");
+        confirmMessage.append("Напрям обміну: ").append(operation.getDirection()).append("\n");
         confirmMessage.append("Ваш курс: ").append(operation.getRate()).append("\n");
         confirmMessage.append("Віддаєте: ").append(operation.getAmount()).append("\n");
         confirmMessage.append("Отримуєте: ").append(operation.getReceive()).append("\n\n");
-        confirmMessage.append("Курс для вашої операції зафіксовано до ").append("[time from server]");
+        confirmMessage.append("Курс для вашої операції зафіксовано до ").append(response.getOperationTime());
 
         return confirmMessage.toString();
     }
