@@ -51,7 +51,7 @@ public class CurrencyAmount extends CurrencyDirections {
             commitExchange(context, amount.get());
         } else {
             setTo(context);
-            botService.sendMessage(payload.getChatId(), "Введіть суму обміну у обраній валюті");
+            botService.sendMessage(payload.getChatId(), "Введіть суму у валюті обміну (доллар, євро або злотий)");
         }
     }
 

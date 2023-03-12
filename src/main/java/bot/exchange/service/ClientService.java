@@ -46,7 +46,7 @@ public class ClientService {
     public void sendIdentityErrorMessage(Update update) {
         String chatId = String.valueOf(update.getMessage().getChat().getId());
         botService.sendMessage(chatId,
-                "Для продолжения работы с ботом необходимо установить username.");
+                "Для продовження роботи с ботом необхідно встановити username.");
     }
 
     public void handleClient(Update update) {
@@ -94,7 +94,7 @@ public class ClientService {
     private void sendClientCreationErrorMessage(Long chatId) {
         SendMessage clientCreationErrorMessage = new SendMessage();
         clientCreationErrorMessage.setChatId(chatId);
-        clientCreationErrorMessage.setText("Ошибка регистарции. Свяжитесь с технической поддержкой.");
+        clientCreationErrorMessage.setText("Помилка реєстрації. Зв'яжіться з технічною підтримкою.");
 
         botService.sendMessage(clientCreationErrorMessage);
     }
