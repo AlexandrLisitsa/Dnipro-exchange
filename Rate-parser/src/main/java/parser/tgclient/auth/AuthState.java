@@ -1,4 +1,4 @@
-package bot.tgclient.auth;
+package parser.tgclient.auth;
 
 import org.springframework.stereotype.Component;
 

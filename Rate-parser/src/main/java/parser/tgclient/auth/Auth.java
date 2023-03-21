@@ -1,4 +1,4 @@
-package bot.tgclient.auth;
+package parser.tgclient.auth;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package bot.tgclient.parser;
+package parser.tgclient.parser;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

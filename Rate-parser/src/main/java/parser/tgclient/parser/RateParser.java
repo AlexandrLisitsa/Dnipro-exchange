@@ -1,4 +1,4 @@
-package bot.tgclient.parser;
+package parser.tgclient.parser;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

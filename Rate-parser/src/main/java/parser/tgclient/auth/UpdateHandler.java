@@ -1,4 +1,4 @@
-package bot.tgclient.auth;
+package parser.tgclient.auth;
 
 import org.drinkless.tdlib.Client;
 import org.drinkless.tdlib.TdApi;
