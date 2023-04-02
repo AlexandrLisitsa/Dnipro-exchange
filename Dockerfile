@@ -28,7 +28,7 @@ RUN chown tguser log/
 USER tguser
 
 #Add jar file generated via mvn 'cleaninstall spring-boot:repackage'
-ADD ./Dnipro-exchange-1.0-SNAPSHOT.jar tg-spring.jar
+ADD ./Rate-parser-1.0-SNAPSHOT.jar tg-spring.jar
 #Add TDLib
 ADD ./libtdjni.so /TDLib/libtdjni.so
 
