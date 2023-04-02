@@ -23,7 +23,13 @@ public class ConfirmExchange extends Transition {
                 .source(State.PRE_CONFIRM_EXCHANGE)
                 .event(Event.CONFIRM_EXCHANGE)
                 .target(State.CONFIRM_EXCHANGE)
-                .action(this);
+                .action(this)
+                .and()
+                .withExternal()
+                .source(State.CONFIRM_EXCHANGE)
+                .target(State.MAIN_MENU)
+                .event(Event.MAIN_MENU)
+                .action(mainMenu);
     }
 
     @Override

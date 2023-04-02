@@ -182,9 +182,9 @@ public class ExchangeHttpService extends HttpService {
     public static class Operation {
         private int client;
         private String direction;
-        private double amount;
+        private String amount;
         private double discount;
-        private double receive;
+        private String receive;
         private double rate;
     }
 

@@ -104,11 +104,11 @@ public class CurrencyAmount extends CurrencyDirections {
     }
 
     private String getExchangeMessage(ExchangeHttpService.Operation operation) {
-        String exchangeTo = operation.getDirection().split("->")[1];
 
         StringBuilder message = new StringBuilder("Операція\n");
         message.append(operation.getDirection()).append("\n");
-        message.append("До видачі: ").append(operation.getReceive()).append(" ").append(exchangeTo).append("\n\n");
+        message.append("Отримуєте: ").append(operation.getReceive()).append("\n");
+        message.append("Віддаєте: ").append(operation.getAmount()).append("\n\n");
         message.append("Оберіть зручний пункт обміну валют для здійснення операції");
 
         return message.toString();
