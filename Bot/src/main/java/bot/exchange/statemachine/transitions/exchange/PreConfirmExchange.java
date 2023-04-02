@@ -71,7 +71,7 @@ public class PreConfirmExchange extends Transition {
                 .build();
         InlineKeyboardButton decline = InlineKeyboardButton.builder()
                 .text("Відмінити")
-                .callbackData(Event.CONFIRM_EXCHANGE + ";")
+                .callbackData(Event.MAIN_MENU + ";")
                 .build();
 
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
