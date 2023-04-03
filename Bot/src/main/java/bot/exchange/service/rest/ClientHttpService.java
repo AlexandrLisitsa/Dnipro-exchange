@@ -62,7 +62,7 @@ public class ClientHttpService extends HttpService {
         private double ref_balance;
         @Getter(AccessLevel.PRIVATE)
         private double ref_link;
-        private Map<String, CurrencyValue> rates;
+        private Map<String, Discounts> rates;
 
         public double getRefBalance() {
             return ref_balance;
@@ -74,7 +74,17 @@ public class ClientHttpService extends HttpService {
     }
 
     @Data
-    public static class CurrencyValue {
+    public static class Discounts {
+        private String from;
+        private String to;
+        private String discount;
+        private Map<String, Rates> rates;
+
+
+    }
+
+    @Data
+    public static class Rates {
         private BigDecimal buy;
         private BigDecimal sell;
     }

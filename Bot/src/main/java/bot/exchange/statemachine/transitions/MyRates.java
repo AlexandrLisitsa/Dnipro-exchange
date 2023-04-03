@@ -53,13 +53,14 @@ public class MyRates extends Transition {
         }
     }
 
-    private void displayRates(Map<String, ClientHttpService.CurrencyValue> clientRates, String chatId) {
+    private void displayRates(Map<String, ClientHttpService.Discounts> clientRates, String chatId) {
 
         StringBuilder ratesMessage = new StringBuilder("<<< Мої курси >>>").append("\n\n");
         clientRates.forEach((currency, values) -> {
             ratesMessage.append("         ").append(currency.toUpperCase()).append("\n");
-            ratesMessage.append("Купівля: ").append(values.getBuy()).append("\n");
-            ratesMessage.append("Продаж: ").append(values.getSell()).append("\n\n");
+            // TODO: 03.04.2023 I think that we need to remove this state
+            //   ratesMessage.append("Купівля: ").append(values.getBuy()).append("\n");
+            //  ratesMessage.append("Продаж: ").append(values.getSell()).append("\n\n");
         });
 
         InlineKeyboardButton mainMenuButton = InlineKeyboardButton.builder()
