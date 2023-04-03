@@ -106,8 +106,8 @@ public class MainMenu extends Transition {
         message.append("Ваш персональний курс:").append("\n\n");
 
         clientInfo.ifPresent(client -> {
-            client.getRates().forEach((currency, value) -> {
-                message.append(currency).append(" ").append(value.getBuy()).append("/").append(value.getSell()).append("\n");
+            client.getRates().forEach((level, discounts) -> {
+                appendDiscountMessage(message, discounts);
             });
         });
 
@@ -126,6 +126,20 @@ public class MainMenu extends Transition {
 
         return message.toString();
 
+    }
+
+    private void appendDiscountMessage(StringBuilder message, ClientHttpService.Discounts discounts) {
+        if (discounts.getFrom() == null) {
+            message.append("При обміні до ").append(discounts.getTo()).append(":\n");
+        } else if (discounts.getTo() == null) {
+            message.append("При обміні від ").append(discounts.getFrom()).append(":\n");
+        } else {
+            message.append("При обміні від ").append(discounts.getFrom()).append(" до ").append(discounts.getTo()).append(":\n");
+        }
+        discounts.getRates().forEach((currency, rates) -> {
+            message.append(currency).append(" ").append(rates.getBuy()).append("/").append(rates.getSell()).append("\n");
+        });
+        message.append("\n");
     }
 
 }
