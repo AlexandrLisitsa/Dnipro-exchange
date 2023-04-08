@@ -79,8 +79,6 @@ public class ClientHttpService extends HttpService {
         private String to;
         private String discount;
         private Map<String, Rates> rates;
-
-
     }
 
     @Data

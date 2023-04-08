@@ -10,16 +10,21 @@ import org.springframework.statemachine.config.builders.StateMachineTransitionCo
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @WithStateMachine
 public class MainMenu extends Transition {
 
     @Autowired
     private ClientHttpService clientHttpService;
+
+    private DateTimeFormatter dateTemplate = DateTimeFormatter.ofPattern("dd.MM.yyyy на HH.mm");
+    private Map<String, String> iconByCurrency = Map.of(
+            "USD", "\uD83C\uDDFA\uD83C\uDDF8",
+            "EUR", "\uD83C\uDDEA\uD83C\uDDFA",
+            "PLN", "\uD83C\uDDF5\uD83C\uDDF1");
 
     @Override
     public void configure(StateMachineTransitionConfigurer<State, Event> transitions) throws Exception {
@@ -101,9 +106,10 @@ public class MainMenu extends Transition {
 
     private String getGreetingMessage(String phoneNumber) {
         Optional<ClientHttpService.Client> clientInfo = clientHttpService.getClientInfo(phoneNumber);
-        StringBuilder message = new StringBuilder("Обмін валют Dnipro Exchange").append("\n\n");
-        message.append("Найвигідніший курс у місті Дніпро!").append("\n\n");
-        message.append("Ваш персональний курс:").append("\n\n");
+        StringBuilder message = new StringBuilder();
+        printDateTitle(message);
+        message.append("\uD83D\uDCB0\uD83D\uDCB0\uD83D\uDCB0 Найвигідніший курс у місті Дніпро! \uD83D\uDCB0\uD83D\uDCB0\uD83D\uDCB0").append("\n\n");
+        message.append("‼️Ваш персональний курс:").append("\n\n");
 
         clientInfo.ifPresent(client -> {
             client.getRates().forEach((level, discounts) -> {
@@ -125,19 +131,28 @@ public class MainMenu extends Transition {
         message.append("\uD83D\uDD70 Графік роботи: 8:30-19:00.").append("\n");
 
         return message.toString();
+    }
 
+    private void printDateTitle(StringBuilder message) {
+        LocalDateTime now = LocalDateTime.now();
+        message.append("\uD83D\uDCC6 ").append(now.format(dateTemplate)).append(" \uD83D\uDCB1").append("\n\n");
     }
 
     private void appendDiscountMessage(StringBuilder message, ClientHttpService.Discounts discounts) {
         if (discounts.getFrom() == null) {
-            message.append("При обміні до ").append(discounts.getTo()).append(":\n");
+            message.append("При обміні до $").append(discounts.getTo()).append(":\n");
         } else if (discounts.getTo() == null) {
-            message.append("При обміні від ").append(discounts.getFrom()).append(":\n");
+            message.append("При обміні від $").append(discounts.getFrom()).append(":\n");
         } else {
-            message.append("При обміні від ").append(discounts.getFrom()).append(" до ").append(discounts.getTo()).append(":\n");
+            message.append("При обміні від $").append(discounts.getFrom()).append(" до $").append(discounts.getTo()).append(":\n");
         }
         discounts.getRates().forEach((currency, rates) -> {
-            message.append(currency).append(" ").append(rates.getBuy()).append("/").append(rates.getSell()).append("\n");
+            String currencyUpperCase = currency.toUpperCase();
+            message.append(iconByCurrency.get(currencyUpperCase)).append(currencyUpperCase)
+                    .append(" ")
+                    .append(rates.getBuy())
+                    .append("/")
+                    .append(rates.getSell()).append("\n");
         });
         message.append("\n");
     }
