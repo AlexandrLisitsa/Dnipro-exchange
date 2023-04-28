@@ -12,7 +12,7 @@ yes | apt-get upgrade && \
 yes | apt-get install zlib1g-dev && \
 yes | apt-get install libssl-dev && \
 #Install Java
-apt-get install openjdk-8-jdk -y
+apt-get install openjdk-11-jdk -y
 
 #Setting up WORKDIR
 WORKDIR /Dnipro-exchange
@@ -28,12 +28,14 @@ RUN chown tguser log/
 USER tguser
 
 #Add jar file generated via mvn 'cleaninstall spring-boot:repackage'
-ADD ./Rate-parser-1.0-SNAPSHOT.jar tg-spring.jar
+ADD ./Rate-parser/target/Rate-parser-1.0-SNAPSHOT.jar tg-spring.jar
 #Add TDLib
-ADD ./libtdjni.so /TDLib/libtdjni.so
+ADD libtdjni.so /TDLib/libtdjni.so
 
 #Expose ports outside of our docker image
 EXPOSE 8080
 
 #Start application
 CMD java -cp tg-spring.jar -Dspring.profiles.active=dev -Djava.library.path="/TDLib" -jar tg-spring.jar --bot.token=5499221266:AAGLtrFdvP4DEQTrapIc3GdJtek0KfM9r3Y --api.token=huyiCb9YZN30LFOcz5H7obc4Eu3WRfV0nMx3usjRUEKm53TObh4pxuQRdfs0u9zrql3jBRtJCMGt5xyl
+
+#/usr/lib/jvm/java-11-openjdk-amd64

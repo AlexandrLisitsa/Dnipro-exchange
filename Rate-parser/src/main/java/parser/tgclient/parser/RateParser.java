@@ -2,19 +2,13 @@ package parser.tgclient.parser;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.drinkless.tdlib.Client;
-import org.drinkless.tdlib.TdApi;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,58 +17,16 @@ import java.util.regex.Pattern;
 public class RateParser {
 
     private final Pattern ratePattern = Pattern.compile("\\S+ (\\d+.\\d+ / \\d+.\\d+)", Pattern.CASE_INSENSITIVE);
-    @Autowired
-    private Client client;
-    private long cachedMenorahId = -1;
 
-    public MenorahRates getMenorahRates() {
-        MenorahRates rates = null;
-        try {
-            TdApi.Chats chats = getChats();
-            TdApi.Chat menorahChat = getMenorahChat(chats);
-            rates = getRates(menorahChat);
-            System.out.println(rates);
+    public MenorahRates getRates(String messageContext) {
 
-        } catch (ExecutionException | InterruptedException e) {
-            log.error("Error getting chats", e);
-        }
-        return rates;
-    }
-
-    private TdApi.Chats getChats() throws ExecutionException, InterruptedException {
-        return (TdApi.Chats) client.send(new TdApi.GetChats(null, 100)).get();
-    }
-
-    private TdApi.Chat getMenorahChat(TdApi.Chats chats) throws ExecutionException, InterruptedException {
-        TdApi.Chat menorahChat = null;
-        if (cachedMenorahId != -1) {
-            menorahChat = (TdApi.Chat) client.send(new TdApi.GetChat(cachedMenorahId)).get();
-        }
-        if (menorahChat == null || !menorahChat.title.contains("МЕНОРА")) {
-            for (long chatId : chats.chatIds) {
-                TdApi.Chat chat = (TdApi.Chat) client.send(new TdApi.GetChat(chatId)).get();
-                if (chat.title.contains("МЕНОРА")) {
-                    menorahChat = chat;
-                    cachedMenorahId = chatId;
-                    break;
-                }
-            }
-        }
-        return menorahChat;
-    }
-
-    private MenorahRates getRates(TdApi.Chat chat) throws ExecutionException, InterruptedException {
-        Optional<TdApi.Message> lastRateMessage = getLastRateMessage(chat);
-        TdApi.Message lastRate = lastRateMessage.orElseThrow(() -> new RuntimeException("Message is not found"));
-        String text = ((TdApi.MessageText) lastRate.content).text.text;
-
-        RateLanguage messageLanguage = getMessageLanguage(text);
+        RateLanguage messageLanguage = getMessageLanguage(messageContext);
 
         MenorahRates menorahRates = null;
         if (messageLanguage == RateLanguage.UA) {
-            menorahRates = parseUaMessage(text);
+            menorahRates = parseUaMessage(messageContext);
         } else {
-            menorahRates = parseRuMessage(text);
+            menorahRates = parseRuMessage(messageContext);
         }
         return menorahRates;
     }
@@ -146,27 +98,6 @@ public class RateParser {
         }
 
         return date;
-    }
-
-    private Optional<TdApi.Message> getLastRateMessage(TdApi.Chat chat) throws ExecutionException, InterruptedException {
-        TdApi.Messages lastMessage = (TdApi.Messages) client.send(new TdApi.GetChatHistory(chat.id, 0, 0, 10, false)).get();
-        long lastMessageId = lastMessage.messages[0].id;
-        TdApi.Messages top10 = (TdApi.Messages) client.send(new TdApi.GetChatHistory(chat.id, lastMessageId, 0, 10, false)).get();
-
-        List<TdApi.Message> messages = new ArrayList<>();
-        messages.addAll(Arrays.asList(lastMessage.messages));
-        messages.addAll(Arrays.asList(top10.messages));
-
-        return messages.stream().filter(message -> {
-            boolean isText = message.content instanceof TdApi.MessageText;
-            RateLanguage rateLanguage = RateLanguage.NONE;
-            if (isText) {
-                String text = ((TdApi.MessageText) message.content).text.text;
-                rateLanguage = getMessageLanguage(text);
-            }
-
-            return rateLanguage != RateLanguage.NONE;
-        }).findFirst();
     }
 
     private RateLanguage getMessageLanguage(String message) {
