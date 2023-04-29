@@ -1,6 +1,6 @@
 package bot.exchange.statemachine.transitions;
 
-import bot.exchange.service.rest.BankHttpService;
+import bot.exchange.service.rest.MenorahHttpService;
 import bot.exchange.statemachine.Event;
 import bot.exchange.statemachine.Payload;
 import bot.exchange.statemachine.State;
@@ -20,7 +20,7 @@ public class BankRates extends Transition {
     @Autowired
     private MainMenu mainMenu;
     @Autowired
-    private BankHttpService bankHttpService;
+    private MenorahHttpService menorahHttpService;
 
     @Override
     public void configure(StateMachineTransitionConfigurer<State, Event> transitions) throws Exception {
@@ -45,7 +45,7 @@ public class BankRates extends Transition {
     @Override
     public void execute(StateContext<State, Event> context) {
 
-        Map<String, BankHttpService.BankValue> bankRates = bankHttpService.getBankRates();
+        Map<String, MenorahHttpService.Rates> bankRates = menorahHttpService.getMenorahRates();
 
         StringBuilder ratesMessage = new StringBuilder("<<< Актуальний банківський курс >>>").append("\n\n");
         bankRates.forEach((currency, values) -> {
