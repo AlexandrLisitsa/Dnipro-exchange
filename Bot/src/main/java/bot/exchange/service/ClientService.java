@@ -3,8 +3,10 @@ package bot.exchange.service;
 import bot.exchange.db.entity.Client;
 import bot.exchange.db.repository.UserRepo;
 import bot.exchange.service.rest.ClientHttpService;
+import bot.exchange.service.rest.MenorahHttpService;
 import bot.exchange.statemachine.StateMachineService;
 import bot.exchange.telegram.BotService;
+import bot.exchange.telegram.Icons;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -15,7 +17,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,12 +37,15 @@ public class ClientService {
 
     @Autowired
     private ClientHttpService clientHttpService;
+    @Autowired
+    private MenorahHttpService menorahHttpService;
 
     @Autowired
     private StateMachineService stateMachineService;
 
     @Autowired
     private UserRepo userRepo;
+    private DateTimeFormatter dateTemplate = DateTimeFormatter.ofPattern("dd.MM.yyyy на HH.mm");
 
     public boolean isUserIdPresent(Update update) {
         return update.getMessage().getChat().getUserName() != null;
@@ -111,7 +119,7 @@ public class ClientService {
     public void sendAuthorizationRequest(Update update) {
         SendMessage authMessage = new SendMessage();
         authMessage.setChatId(update.getMessage().getChatId());
-        authMessage.setText("Для продовження відправте номер телефону.");
+        authMessage.setText(getGreetingMessage());
 
         // create keyboard
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
@@ -126,7 +134,7 @@ public class ClientService {
         // first keyboard line
         KeyboardRow keyboardFirstRow = new KeyboardRow();
         KeyboardButton keyboardButton = new KeyboardButton();
-        keyboardButton.setText("Відправити номер телефону.");
+        keyboardButton.setText("Увійти");
         keyboardButton.setRequestContact(true);
         keyboardFirstRow.add(keyboardButton);
 
@@ -138,4 +146,27 @@ public class ClientService {
 
         botService.sendMessage(authMessage);
     }
+
+    private String getGreetingMessage() {
+        StringBuilder message = new StringBuilder();
+        message.append("\uD83D\uDCB0\uD83D\uDCB0\uD83D\uDCB0 Обмін валют Дай Долар! \uD83D\uDCB0\uD83D\uDCB0\uD83D\uDCB0").append("\n\n");
+
+        String date = LocalDateTime.now().format(dateTemplate);
+        message.append("Раздрібний курс на ").append(date).append("\n\n");
+
+        LinkedHashMap<String, MenorahHttpService.Rates> menorahRates = menorahHttpService.getMenorahRates();
+        menorahRates.forEach((currency, rate) -> {
+            String currencyUpperCase = currency.toUpperCase();
+            message.append(Icons.CURRENCY_ICONS.get(currencyUpperCase)).append(currencyUpperCase)
+                    .append(" ").append(rate.getBuy()).append("/").append(rate.getSell()).append("\n");
+        });
+        message.append("\n");
+
+        message.append("\uD83D\uDCC8\uD83D\uDCC9 Курс залежить від суми обміну і вашої персональної знижки. Реєструйся у нашому і міняй валюту за найвигіднішим курсом у м. Дніпро!\n" +
+                "Для отримання спеціальних знижок натиснить кнопку \n" +
+                "⬇️Увійти⬇️");
+
+        return message.toString();
+    }
+
 }

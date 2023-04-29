@@ -3,6 +3,7 @@ package bot.exchange.statemachine.transitions;
 import bot.exchange.service.rest.ClientHttpService;
 import bot.exchange.statemachine.Event;
 import bot.exchange.statemachine.State;
+import bot.exchange.telegram.Icons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.annotation.WithStateMachine;
@@ -12,7 +13,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @WithStateMachine
 public class MainMenu extends Transition {
@@ -21,10 +25,6 @@ public class MainMenu extends Transition {
     private ClientHttpService clientHttpService;
 
     private DateTimeFormatter dateTemplate = DateTimeFormatter.ofPattern("dd.MM.yyyy на HH.mm");
-    private Map<String, String> iconByCurrency = Map.of(
-            "USD", "\uD83C\uDDFA\uD83C\uDDF8",
-            "EUR", "\uD83C\uDDEA\uD83C\uDDFA",
-            "PLN", "\uD83C\uDDF5\uD83C\uDDF1");
 
     @Override
     public void configure(StateMachineTransitionConfigurer<State, Event> transitions) throws Exception {
@@ -123,7 +123,7 @@ public class MainMenu extends Transition {
         message.append("\n\n");
 
         message.append("\uD83D\uDCB8 Приймаємо зношені купюри з комісією від 15%.").append("\n");
-        message.append("\uD83D\uDC49 Продаємо долари нового зразка (від 2009 року) на 5 копійок більше ніж оптовий курс на відділенні \uD83D\uDCB5");
+        message.append("\uD83D\uDC49 Міняємо долари старого зразка на нові купюри \uD83D\uDCB5");
         message.append("\n\n");
 
         message.append("Залишились питання, зв’яжіться з відділом продажів:").append("\n");
@@ -148,7 +148,7 @@ public class MainMenu extends Transition {
         }
         discounts.getRates().forEach((currency, rates) -> {
             String currencyUpperCase = currency.toUpperCase();
-            message.append(iconByCurrency.get(currencyUpperCase)).append(currencyUpperCase)
+            message.append(Icons.CURRENCY_ICONS.get(currencyUpperCase)).append(currencyUpperCase)
                     .append(" ")
                     .append(rates.getBuy())
                     .append("/")
