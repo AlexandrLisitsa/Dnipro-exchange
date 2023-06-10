@@ -64,22 +64,12 @@ public class CurrencyAmount extends CurrencyDirections {
                 direction,
                 stringAmount);
 
-        processExchangeResponse(commitExchangeResponse, context);
-    }
-
-    private void processExchangeResponse(ExchangeHttpService.CommitExchangeResponse response, StateContext<State, Event> context) {
-        List<ExchangeHttpService.Exchanger> readyExchangers = getAvailableExchangers(response);
-
-        if (readyExchangers.isEmpty()) {
-            sendIsNotEnoughMessage(context);
-        } else {
-            context.getExtendedState().getVariables().put("exchange", response);
-            sendLocationsToExchange(context, response);
-        }
+        sendLocationsToExchange(context, commitExchangeResponse);
     }
 
     private void sendLocationsToExchange(StateContext<State, Event> context, ExchangeHttpService.CommitExchangeResponse response) {
-        String exchangeMessage = getExchangeMessage(response.getOperation());
+        context.getExtendedState().getVariables().put("exchange", response);
+        String exchangeMessage = getExchangeMessage(response);
         InlineKeyboardMarkup availableLocations = getAvailableLocations(response.getAvaliable_exchangers());
         long chatId = getChatId(context);
 
@@ -103,20 +93,28 @@ public class CurrencyAmount extends CurrencyDirections {
         return inlineKeyboardMarkup;
     }
 
-    private String getExchangeMessage(ExchangeHttpService.Operation operation) {
+    private String getExchangeMessage(ExchangeHttpService.CommitExchangeResponse response) {
 
-        StringBuilder message = new StringBuilder("Операція\n");
+        ExchangeHttpService.Operation operation = response.getOperation();
+
+        List<ExchangeHttpService.Exchanger> availableExchangers = getAvailableExchangers(response);
+
+        StringBuilder message;
+
+        if (availableExchangers.isEmpty()) {
+            message = new StringBuilder("Нам потрібен деякий час для підготовки потрібної суми, " +
+                    "з вами зв’яжеться наш менеджер для обговорення деталей операції\n\n");
+        } else {
+            message = new StringBuilder();
+        }
+
+        message.append("Операція\n");
         message.append(operation.getDirection()).append("\n");
         message.append("Отримуєте: ").append(operation.getReceive()).append("\n");
         message.append("Віддаєте: ").append(operation.getAmount()).append("\n\n");
         message.append("Оберіть зручний пункт обміну валют для здійснення операції");
 
         return message.toString();
-    }
-
-    private void sendIsNotEnoughMessage(StateContext<State, Event> context) {
-        goToMainMenu(context, "Нам потрібен деякий час для підготовки потрібної суми," +
-                " з вами зв’яжеться наш менеджер для обговорення деталей операції");
     }
 
     private List<ExchangeHttpService.Exchanger> getAvailableExchangers(ExchangeHttpService.CommitExchangeResponse response) {
