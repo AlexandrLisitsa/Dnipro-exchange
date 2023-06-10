@@ -15,8 +15,8 @@ yes | apt-get install libssl-dev && \
 apt-get install openjdk-11-jdk -y
 
 #Setting up WORKDIR
-WORKDIR /Dnipro-exchange
-RUN chmod 777 /Dnipro-exchange
+WORKDIR /home
+#RUN chmod 777 /Dnipro-exchange
 
 RUN mkdir -p log/
 RUN mkdir -p tdlib/

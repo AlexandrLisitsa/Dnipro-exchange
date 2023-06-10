@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.drinkless.tdlib.Client;
 import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Component;
+import parser.rest.RateUpdater;
 import parser.tgclient.parser.RateParser;
 
 import java.util.Locale;
@@ -13,6 +14,7 @@ import java.util.Locale;
 class UpdateHandler implements Client.ResultHandler {
     private final Auth authenticator;
     private final RateParser rateParser;
+    private final RateUpdater rateUpdater;
 
     @Override
     public void onResult(TdApi.Object object) {
@@ -24,7 +26,7 @@ class UpdateHandler implements Client.ResultHandler {
                 String text = ((TdApi.MessageText) updateChat.lastMessage.content).text.text.toLowerCase(Locale.ROOT);
                 if (text.contains("vkursedpua")) {
                     RateParser.MenorahRates rates = rateParser.getRates(text);
-                    System.err.println(rates);
+                    rateUpdater.updateRates(rates);
                 }
             }
         }
