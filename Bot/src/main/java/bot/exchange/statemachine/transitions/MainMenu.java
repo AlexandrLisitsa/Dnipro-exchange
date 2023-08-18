@@ -4,6 +4,7 @@ import bot.exchange.service.rest.ClientHttpService;
 import bot.exchange.statemachine.Event;
 import bot.exchange.statemachine.State;
 import bot.exchange.telegram.Icons;
+import bot.utils.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.annotation.WithStateMachine;
@@ -11,7 +12,6 @@ import org.springframework.statemachine.config.builders.StateMachineTransitionCo
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
@@ -107,8 +107,13 @@ public class MainMenu extends Transition {
     private String getGreetingMessage(String phoneNumber) {
         Optional<ClientHttpService.Client> clientInfo = clientHttpService.getClientInfo(phoneNumber);
         StringBuilder message = new StringBuilder();
-        printDateTitle(message);
+
+        message.append("\uD83D\uDCC6 ").append(DateTimeUtils.getFormattedKievDateTime()).append(" \uD83D\uDCB1 \n\n");
+
         message.append("\uD83D\uDCB0\uD83D\uDCB0\uD83D\uDCB0 Найвигідніший курс у місті Дніпро! \uD83D\uDCB0\uD83D\uDCB0\uD83D\uDCB0").append("\n\n");
+
+        message.append("\uD83D\uDCB2Доллар нового зразка +0,1 грн до курсу\uD83D\uDCB2").append("\n\n");
+
         message.append("‼️Ваш персональний курс:").append("\n\n");
 
         clientInfo.ifPresent(client -> {
@@ -118,24 +123,24 @@ public class MainMenu extends Transition {
         });
 
         message.append("\n");
-        message.append("\uD83D\uDCC8\uD83D\uDCC9 Курс залежить від суми обміну і вашої персональної знижки." +
-                " Натисніть обмін і введіть бажану суму, щоб дізнатись остаточний курс. Або тисни на Наші правила.");
+        message.append("\uD83D\uDCC8\uD83D\uDCC9 Курс залежить від суми обміну і вашої персональної знижки. Натисніть обмін і введіть бажану суму, щоб дізнатись остаточний курс. Або тисни на Наші правила.");
         message.append("\n\n");
 
         message.append("\uD83D\uDCB8 Приймаємо зношені купюри з комісією від 15%.").append("\n");
         message.append("\uD83D\uDC49 Міняємо долари старого зразка на нові купюри \uD83D\uDCB5");
         message.append("\n\n");
 
-        message.append("Залишились питання, зв’яжіться з відділом продажів:").append("\n");
-        message.append("\uD83D\uDCF1 +38050 000 00 00").append("\n");
-        message.append("\uD83D\uDD70 Графік роботи: 8:30-19:00.").append("\n");
+        message.append("✅ Наші переваги:\n" +
+                "- безпека та конфедиційність\n" +
+                "- видача чека операції\n" +
+                "- доставка валюти за запитом\n" +
+                "- розвинута мережа обмінів валют").append("\n\n");
+
+        message.append("Залишились питання, зв’яжіться з відділом продажів:\n" +
+                "\uD83D\uDCF1 +38 099 655 80 80\n" +
+                "\uD83D\uDD70 Графік роботи: 8:30-19:00.").append("\n");
 
         return message.toString();
-    }
-
-    private void printDateTitle(StringBuilder message) {
-        LocalDateTime now = LocalDateTime.now();
-        message.append("\uD83D\uDCC6 ").append(now.format(dateTemplate)).append(" \uD83D\uDCB1").append("\n\n");
     }
 
     private void appendDiscountMessage(StringBuilder message, ClientHttpService.Discounts discounts) {

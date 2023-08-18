@@ -7,6 +7,7 @@ import bot.exchange.service.rest.MenorahHttpService;
 import bot.exchange.statemachine.StateMachineService;
 import bot.exchange.telegram.BotService;
 import bot.exchange.telegram.Icons;
+import bot.utils.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -17,8 +18,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,7 +44,6 @@ public class ClientService {
 
     @Autowired
     private UserRepo userRepo;
-    private DateTimeFormatter dateTemplate = DateTimeFormatter.ofPattern("dd.MM.yyyy на HH.mm");
 
     public boolean isUserIdPresent(Update update) {
         return update.getMessage().getChat().getUserName() != null;
@@ -118,6 +116,7 @@ public class ClientService {
 
     public void sendAuthorizationRequest(Update update) {
         SendMessage authMessage = new SendMessage();
+        authMessage.enableHtml(true);
         authMessage.setChatId(update.getMessage().getChatId());
         authMessage.setText(getGreetingMessage());
 
@@ -149,10 +148,11 @@ public class ClientService {
 
     private String getGreetingMessage() {
         StringBuilder message = new StringBuilder();
-        message.append("\uD83D\uDCB0\uD83D\uDCB0\uD83D\uDCB0 Обмін валют Дай Долар! \uD83D\uDCB0\uD83D\uDCB0\uD83D\uDCB0").append("\n\n");
+        message.append("<b>УМОВА - Українська Мережа Обмінів Валют</b>").append("\n\n");
 
-        String date = LocalDateTime.now().format(dateTemplate);
-        message.append("Раздрібний курс на ").append(date).append("\n\n");
+        message.append("\uD83D\uDCB0\uD83D\uDCB0\uD83D\uDCB0 Найвигідніший курс в Дніпрі! \uD83D\uDCB0\uD83D\uDCB0\uD83D\uDCB0").append("\n\n");
+
+        message.append("\uD83D\uDCC6 Раздрібний курс на ").append(DateTimeUtils.getFormattedKievDateTime()).append(":\n\n");
 
         LinkedHashMap<String, MenorahHttpService.Rates> menorahRates = menorahHttpService.getMenorahRates();
         menorahRates.forEach((currency, rate) -> {
@@ -162,8 +162,13 @@ public class ClientService {
         });
         message.append("\n");
 
-        message.append("\uD83D\uDCC8\uD83D\uDCC9 Курс залежить від суми обміну і вашої персональної знижки. Реєструйся у нашому і міняй валюту за найвигіднішим курсом у м. Дніпро!\n" +
-                "Для отримання спеціальних знижок натиснить кнопку \n" +
+        message.append("Пропонуємо тобі найвигідніші умови з обміну валют:\n" +
+                "\uD83D\uDD25 знижка 10% на перший обмін;\n" +
+                "\uD83D\uDCB2 курс залежить від суми обміну - вводь суму у бот і отримай кращу пропозицію;\n" +
+                "\uD83D\uDCB8 отримай можливість купляти валюту за спеціальними пропозиціями.\n" +
+                "\n" +
+                "Для отримання персональних пропозицій тисни кнопку\n" +
+                " \n" +
                 "⬇️Увійти⬇️");
 
         return message.toString();

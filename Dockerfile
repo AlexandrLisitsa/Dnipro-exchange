@@ -36,6 +36,6 @@ ADD libtdjni.so /TDLib/libtdjni.so
 EXPOSE 8080
 
 #Start application
-CMD java -cp tg-spring.jar -Dspring.profiles.active=dev -Djava.library.path="/TDLib" -jar tg-spring.jar --bot.token=5499221266:AAGLtrFdvP4DEQTrapIc3GdJtek0KfM9r3Y --api.token=huyiCb9YZN30LFOcz5H7obc4Eu3WRfV0nMx3usjRUEKm53TObh4pxuQRdfs0u9zrql3jBRtJCMGt5xyl
+CMD java -cp tg-spring.jar -Dspring.profiles.active=dev -Djava.library.path="/TDLib" -jar tg-spring.jar --api.token=huyiCb9YZN30LFOcz5H7obc4Eu3WRfV0nMx3usjRUEKm53TObh4pxuQRdfs0u9zrql3jBRtJCMGt5xyl
 
 #/usr/lib/jvm/java-11-openjdk-amd64

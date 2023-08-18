@@ -26,7 +26,9 @@ class UpdateHandler implements Client.ResultHandler {
                 String text = ((TdApi.MessageText) updateChat.lastMessage.content).text.text.toLowerCase(Locale.ROOT);
                 if (text.contains("vkursedpua")) {
                     RateParser.MenorahRates rates = rateParser.getRates(text);
-                    rateUpdater.updateRates(rates);
+                    if (rates.getCurrencies().size() > 0) {
+                        rateUpdater.updateRates(rates);
+                    }
                 }
             }
         }
