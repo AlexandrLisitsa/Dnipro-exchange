@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 @Service
 public class RateParser {
 
-    private static final Pattern ratePattern = Pattern.compile("(.*?)(\\d+\\.\\d+)\\s/\\s(\\d+\\.\\d+).*", Pattern.DOTALL);
+    private static final Pattern ratePattern = Pattern.compile("(.*?)(\\d+\\.\\d+)/(\\d+\\.\\d+).*", Pattern.DOTALL);
 
     public MenorahRates getRates(String text) {
         String[] lines = text.split("\n");
