@@ -112,9 +112,10 @@ public class MainMenu extends Transition {
 
         message.append("\uD83D\uDCB0\uD83D\uDCB0\uD83D\uDCB0 Найвигідніший курс у місті Дніпро! \uD83D\uDCB0\uD83D\uDCB0\uD83D\uDCB0").append("\n\n");
 
-        message.append("\uD83D\uDCB2Доллар нового зразка +0,1 грн до курсу\uD83D\uDCB2").append("\n\n");
+        message.append("\uD83D\uDCB2Доллар нового зразка +0.2 грн до курсу\uD83D\uDCB2").append("\n");
+        message.append("\uD83D\uDCB2Доллар 1996-1999 року за курсом НБУ\uD83D\uDCB2\n").append("\n\n");
 
-        message.append("‼️Ваш персональний курс:").append("\n\n");
+        message.append("‼️Ваш особистий курс:").append("\n\n");
 
         clientInfo.ifPresent(client -> {
             client.getRates().forEach((level, discounts) -> {
@@ -137,7 +138,7 @@ public class MainMenu extends Transition {
                 "- розвинута мережа обмінів валют").append("\n\n");
 
         message.append("Залишились питання, зв’яжіться з відділом продажів:\n" +
-                "\uD83D\uDCF1 +38 099 655 80 80\n" +
+                "\uD83D\uDCF1  +38 067 106 00 55\n" +
                 "\uD83D\uDD70 Графік роботи: 8:30-19:00.").append("\n");
 
         return message.toString();
@@ -147,7 +148,8 @@ public class MainMenu extends Transition {
         if (discounts.getFrom() == null) {
             message.append("При обміні до $").append(discounts.getTo()).append(":\n");
         } else if (discounts.getTo() == null) {
-            message.append("При обміні від $").append(discounts.getFrom()).append(":\n");
+            message.append("При обміні від $").append(" - Індивідуальний курс").append(":\n");
+            return;
         } else {
             message.append("При обміні від $").append(discounts.getFrom()).append(" до $").append(discounts.getTo()).append(":\n");
         }

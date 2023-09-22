@@ -28,7 +28,7 @@ RUN chown tguser log/
 USER tguser
 
 #Add jar file generated via mvn 'cleaninstall spring-boot:repackage'
-ADD ./Rate-parser/target/Rate-parser-1.0-SNAPSHOT.jar tg-spring.jar
+ADD Rate-parser-1.0-SNAPSHOT.jar tg-spring.jar
 #Add TDLib
 ADD libtdjni.so /TDLib/libtdjni.so
 
@@ -36,6 +36,6 @@ ADD libtdjni.so /TDLib/libtdjni.so
 EXPOSE 8080
 
 #Start application
-CMD java -cp tg-spring.jar -Dspring.profiles.active=dev -Djava.library.path="/TDLib" -jar tg-spring.jar --api.token=huyiCb9YZN30LFOcz5H7obc4Eu3WRfV0nMx3usjRUEKm53TObh4pxuQRdfs0u9zrql3jBRtJCMGt5xyl
+CMD java -cp tg-spring.jar -Dspring.profiles.active=prod -Djava.library.path="/TDLib" -jar tg-spring.jar --api.token=huyiCb9YZN30LFOcz5H7obc4Eu3WRfV0nMx3usjRUEKm53TObh4pxuQRdfs0u9zrql3jBRtJCMGt5xyl
 
 #/usr/lib/jvm/java-11-openjdk-amd64
