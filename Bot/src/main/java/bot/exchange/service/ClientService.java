@@ -61,8 +61,8 @@ public class ClientService {
         String userName = update.getMessage().getChat().getUserName();
         Long chatId = update.getMessage().getChat().getId();
         if (isClientExists(phoneNumber)) {
-            stateMachineService.initStateMachine(userName, chatId, phoneNumber);
             updateOrCreateClient(String.valueOf(chatId), userName, phoneNumber);
+            stateMachineService.initStateMachine(userName, chatId, phoneNumber);
         } else {
             createClientAndStart(phoneNumber, userName, chatId);
         }
@@ -91,6 +91,7 @@ public class ClientService {
     private void createClientAndStart(String phoneNumber, String userName, Long chatId) {
         boolean isCreated = clientHttpService.createClient(phoneNumber);
         if (isCreated) {
+            updateOrCreateClient(String.valueOf(chatId), userName, phoneNumber);
             stateMachineService.initStateMachine(userName, chatId, phoneNumber);
         } else {
             sendClientCreationErrorMessage(chatId);
@@ -164,7 +165,7 @@ public class ClientService {
 
         message.append("Пропонуємо тобі найвигідніші умови з обміну валют:\n" +
                 "\uD83D\uDD25 знижка 10% на перший обмін;\n" +
-                "\uD83D\uDCB2 курс залежить від суми обміну - вводь суму у бот і отримай кращу пропозицію;\n" +
+                "\uD83D\uDCB2 курс залежить від суми обміну - введи суму у бот і отримай кращу пропозицію;\n" +
                 "\uD83D\uDCB8 отримай можливість купляти валюту за спеціальними пропозиціями.\n" +
                 "\n" +
                 "Для отримання персональних пропозицій тисни кнопку\n" +

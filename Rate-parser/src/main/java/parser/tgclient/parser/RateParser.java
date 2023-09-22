@@ -32,15 +32,19 @@ public class RateParser {
     private List<Currency> parseCurrency(String[] lines) {
         List<Currency> currencies = new ArrayList<>();
         for (String line : lines) {
-            line = line.replace(",", ".");
+            line = line.replace(",", ".").replaceAll(" ", "");
             Matcher matcher = ratePattern.matcher(line.trim());
             if (matcher.matches()) {
-                Currency currency = new Currency();
-                currency.setName(Objects.requireNonNull(getName(matcher.group(1))).toString());
-                currency.setBuy(Double.parseDouble(matcher.group(2)));
-                currency.setSell(Double.parseDouble(matcher.group(3)));
+                try {
+                    Currency currency = new Currency();
+                    currency.setName(Objects.requireNonNull(getName(matcher.group(1))));
+                    currency.setBuy(Double.parseDouble(matcher.group(2)));
+                    currency.setSell(Double.parseDouble(matcher.group(3)));
 
-                currencies.add(currency);
+                    currencies.add(currency);
+                } catch (Exception e) {
+                    log.warn("Can't parse " + line);
+                }
             }
         }
 
